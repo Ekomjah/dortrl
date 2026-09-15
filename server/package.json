@@ -17,7 +17,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "tsc",
-    "dev": "bun --watch run src/index.ts & tsc --watch"
+    "dev": "bun --watch run src/index.ts & tsc --watch",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:pull": "drizzle-kit pull"
   },
   "dependencies": {
     "hono": "^4.10.8",
@@ -25,6 +30,10 @@
     "@libsql/client": "^0.17.4",
     "drizzle-orm": "1.0.0-rc.4",
     "pino": "^10.3.1",
+    "better-auth": "^1.6.23",
+    "dotenv": "^17.4.2",
+    "drizzle-zod": "^0.8.3",
+    "zod": "^4.4.3",
     "shared": "workspace:*"
   },
   "devDependencies": {

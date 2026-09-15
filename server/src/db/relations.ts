@@ -1,5 +1,5 @@
-import { defineRelations } from 'drizzle-orm'
-import { clicks, links } from './schema.js'
+import { defineRelations } from "drizzle-orm";
+import { clicks, links } from "./schema.js";
 
 export const dbRelations = defineRelations({ links, clicks }, (r) => ({
   links: {
@@ -14,4 +14,4 @@ export const dbRelations = defineRelations({ links, clicks }, (r) => ({
       to: r.links.id,
     }),
   },
-}))
+}));
