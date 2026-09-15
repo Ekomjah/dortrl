@@ -1,0 +1,171 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "id": "0cd055a4-651a-4859-a1e3-37fa992ee2b0",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "ddl": [
+    {
+      "name": "clicks",
+      "entityType": "tables"
+    },
+    {
+      "name": "links",
+      "entityType": "tables"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "link_id",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(unixepoch())",
+      "generated": null,
+      "name": "clicked_at",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "referrer",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "user_agent",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "ip_address",
+      "entityType": "columns",
+      "table": "clicks"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "links"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "short_code",
+      "entityType": "columns",
+      "table": "links"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "original_url",
+      "entityType": "columns",
+      "table": "links"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(unixepoch())",
+      "generated": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "table": "links"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": "(unixepoch('now', '+5 days'))",
+      "generated": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "table": "links"
+    },
+    {
+      "columns": [
+        "link_id"
+      ],
+      "tableTo": "links",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_clicks_link_id_links_id_fk",
+      "entityType": "fks",
+      "table": "clicks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "clicks_pk",
+      "table": "clicks",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "links_pk",
+      "table": "links",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "short_code"
+      ],
+      "nameExplicit": false,
+      "name": "links_short_code_unique",
+      "entityType": "uniques",
+      "table": "links"
+    }
+  ],
+  "renames": []
+}

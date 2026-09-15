@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc",
+    "dev": "bun --watch run src/index.ts & tsc --watch"
+  },
+  "dependencies": {
+    "hono": "^4.10.8",
+    "@hono/zod-validator": "^0.8.0",
+    "@libsql/client": "^0.17.4",
+    "drizzle-orm": "1.0.0-rc.4",
+    "pino": "^10.3.1",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "drizzle-kit": "1.0.0-rc.4",
+    "pino-pretty": "^13.1.3"
+  }
+}

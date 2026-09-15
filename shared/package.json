@@ -1,0 +1,26 @@
+{
+	"name": "shared",
+	"version": "0.0.1",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "drizzle-zod": "^0.8.3",
+    "http-status-codes": "^2.3.0",
+    "nanoid": "^5.1.11",
+    "zod": "^4.4.3"
+  },
+	"devDependencies": {
+		"typescript": "^5.9.3"
+	}
+}
