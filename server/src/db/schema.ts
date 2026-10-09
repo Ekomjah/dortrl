@@ -39,7 +39,7 @@ export const clicks = sqliteTable("clicks", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   link_id: integer("link_id", { mode: "number" })
     .notNull()
-    .references(() => links.id),
+    .references(() => links.id, { onDelete: "cascade" }),
   clicked_at: integer("clicked_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),

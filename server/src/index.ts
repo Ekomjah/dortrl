@@ -2,13 +2,15 @@ import { cors } from "hono/cors";
 import type { ApiResponse } from "shared";
 import { Hono } from "hono";
 import { ReasonPhrases, StatusCodes } from "shared";
-import { requestLogger } from "./middleware/logger.js";
-import linksRoute from "./routes/links/links.routes.js";
-import { linksRepository } from "./routes/links/links.service.js";
-import statsRoute from "./routes/stats/stats.routes.js";
-import { statsService } from "./routes/stats/stats.service.js";
+import { requestLogger } from "./middleware/logger";
+import linksRoute from "./routes/links/links.routes";
+import { linksRepository } from "./routes/links/links.service";
+import statsRoute from "./routes/stats/stats.routes";
+import { statsService } from "./routes/stats/stats.service";
+import { auth } from "./lib/auth";
 
 const app = new Hono({ strict: false });
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 app.use(cors());
 app.use(requestLogger());
 app.notFound((c) =>

@@ -5,7 +5,7 @@ import { db } from "../db/client";
 import * as schema from "../db/schema"; // must export user, session, account, verification
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, { provider: "sqlite" }),
+  database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: { enabled: true },
   socialProviders: {
     google: {
