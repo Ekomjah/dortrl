@@ -1,5 +1,4 @@
 import { drizzle } from "drizzle-orm/libsql";
-import { seed } from "drizzle-seed";
 import * as schema from "../schema";
 import "dotenv/config";
 

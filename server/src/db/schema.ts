@@ -64,3 +64,4 @@ export const selectLinkSchema = createSelectSchema(links);
 export type Click = typeof clicks.$inferInsert;
 export type SelectClick = Omit<Click, "link_id" | "id">;
 export type InsertClicks = Omit<Click, "id" | "clicked_at">;
+export * from './auth-schema'
