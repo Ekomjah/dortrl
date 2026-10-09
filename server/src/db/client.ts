@@ -1,13 +1,7 @@
-import { dirname, resolve } from "node:path";
-import process from "node:process";
-import { fileURLToPath } from "node:url";
 import { createClient } from "@libsql/client";
-import { config } from "dotenv";
+import "dotenv/config";
 import { drizzle } from "drizzle-orm/libsql";
 import { dbRelations as relations } from "./relations.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: resolve(__dirname, "../../.env") }); // ← two levels, not three
 
 const dbUrl = process.env.DB_FILE_NAME;
 
