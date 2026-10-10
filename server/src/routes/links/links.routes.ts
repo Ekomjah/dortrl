@@ -9,6 +9,7 @@ import {
   requireFullAccount,
   enforceLinkLimit,
 } from "@/middleware/auth.middleware.js";
+import { createLinkLimiter } from "@/middleware/rateLimiter.middleware.js";
 
 const linksRoute = new Hono<HonoEnv>()
   .use(optionalAuth)
@@ -22,12 +23,22 @@ const linksRoute = new Hono<HonoEnv>()
       return c.json({ error: "Failed to fetch links" }, 500);
     }
   })
-  .post("/", enforceLinkLimit, ...linkValidators.create(), async (c) => {
-    const user = c.get("user");
-    const itemsToSave = c.req.valid("json");
-    const inserted = await linksRepository.createNewLink(itemsToSave, user.id);
-    return c.json(inserted, StatusCodes.CREATED);
-  })
+  .post(
+    "/",
+    createLinkLimiter,
+    requireUser,
+    enforceLinkLimit,
+    ...linkValidators.create(),
+    async (c) => {
+      const user = c.get("user");
+      const itemsToSave = c.req.valid("json");
+      const inserted = await linksRepository.createNewLink(
+        itemsToSave,
+        user.id,
+      );
+      return c.json(inserted, StatusCodes.CREATED);
+    },
+  )
   .patch(
     "/:code",
     requireFullAccount,
