@@ -1,10 +1,11 @@
 import type { Client } from "@libsql/client";
-import { readdirSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import { afterAll, afterEach, beforeAll } from "vitest";
 
 // Point the app's db client at a throwaway sqlite file BEFORE it is imported.
@@ -15,37 +16,45 @@ process.env.DB_FILE_NAME = `file:${dbPath}`;
 process.env.DB_AUTH_TOKEN = "";
 process.env.APP_ENV = "test";
 
-// Load the generated drizzle migration and apply it to the test db so tables
-// exist. Statements are separated by the drizzle breakpoint marker.
+// Migrations are applied in order by drizzle's own migrator, which sorts the
+// migration folders by name and skips any already recorded in the journal table.
 const migrationsDir = fileURLToPath(
-  new URL("../../db/drizzle/migrations", import.meta.url),
+  new URL("../drizzle/migrations", import.meta.url),
 );
-const migrationName = readdirSync(migrationsDir).find((name) =>
-  statSync(join(migrationsDir, name)).isDirectory(),
-)!;
-const migrationSql = readFileSync(
-  join(migrationsDir, migrationName, "migration.sql"),
-  "utf8",
-);
-const statements = migrationSql
-  .split("--> statement-breakpoint")
-  .map((s) => s.trim())
-  .filter(Boolean);
 
 let client: Client;
 
+const TABLES_IN_DROP_ORDER = [
+  "clicks",
+  "account",
+  "session",
+  "verification",
+  "links",
+  "user",
+] as const;
+
+async function existingTables(): Promise<Set<string>> {
+  const res = await client.execute(
+    "SELECT name FROM sqlite_master WHERE type='table'",
+  );
+  return new Set(res.rows.map((row) => String(row.name)));
+}
+
 beforeAll(async () => {
   client = createClient({ url: `file:${dbPath}` });
-  await client.execute("DROP TABLE IF EXISTS clicks");
-  await client.execute("DROP TABLE IF EXISTS links");
-  for (const stmt of statements) {
-    await client.execute(stmt);
+  for (const table of TABLES_IN_DROP_ORDER) {
+    await client.execute(`DROP TABLE IF EXISTS \`${table}\``);
   }
+  await migrate(drizzle({ client }), { migrationsFolder: migrationsDir });
 });
 
 afterEach(async () => {
-  await client.execute("DELETE FROM clicks");
-  await client.execute("DELETE FROM links");
+  const present = await existingTables();
+  for (const table of TABLES_IN_DROP_ORDER) {
+    if (present.has(table)) {
+      await client.execute(`DELETE FROM \`${table}\``);
+    }
+  }
 });
 
 afterAll(() => {

@@ -1,17 +1,19 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
-// Resolve monorepo path-alias imports (`db`, `db/*.js`, `shared`) that the app
-// source uses. These map to TS sources one level up in `packages/`.
-const dbDir = fileURLToPath(new URL('../db/', import.meta.url))
-const dbClient = fileURLToPath(new URL('../db/client.ts', import.meta.url))
-const sharedIndex = fileURLToPath(new URL('../shared/index.ts', import.meta.url))
+// Mirrors the `@/*` -> `src/*` path alias in tsconfig.json. The `.js` form is
+// mapped to its TypeScript source because the app imports use ESM extensions.
+const srcDir = fileURLToPath(new URL('./src/', import.meta.url))
+
+// Resolve the `shared` workspace import that the app source uses. The package
+// entrypoint is `dist`, but tests run against the TypeScript source directly.
+const sharedIndex = fileURLToPath(new URL('../shared/src/index.ts', import.meta.url))
 
 export default defineConfig({
   resolve: {
     alias: [
-      { find: /^db$/, replacement: dbClient },
-      { find: /^db\/(.*)\.js$/, replacement: `${dbDir}$1.ts` },
+      { find: /^@\/(.*)\.js$/, replacement: `${srcDir}$1.ts` },
+      { find: /^@\//, replacement: srcDir },
       { find: /^shared$/, replacement: sharedIndex },
     ],
   },
