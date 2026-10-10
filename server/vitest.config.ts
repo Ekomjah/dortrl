@@ -22,5 +22,7 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     isolate: true,
     pool: 'forks',
+    // Each test signs up a user, and password hashing dominates that cost.
+    hookTimeout: 30000,
   },
 })
