@@ -6,6 +6,7 @@ import {
   integer,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { generateId } from "shared";
@@ -18,6 +19,7 @@ export const links = sqliteTable(
     user_id: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    link_text: text("link_text"),
     short_code: text("short_code")
       .unique()
       .$defaultFn(() => generateId(15))
@@ -32,6 +34,11 @@ export const links = sqliteTable(
   },
   (table) => [
     index("original_url_idx").on(table.original_url),
+    uniqueIndex("links_link_text_uidx").on(table.link_text),
+    check(
+      "link_text_length",
+      sql`link_text is null OR (length(link_text) >= 5 AND length(link_text) <= 15)`,
+    ),
     check(
       "short_code_length",
       sql`length(${table.short_code}) >= 5 AND length(${table.short_code}) <= 15`,
@@ -54,13 +61,18 @@ export const clicks = sqliteTable("clicks", {
 
 export type NewLink = typeof links.$inferInsert;
 export type SelectLink = typeof links.$inferSelect;
-export type InsertLink = Pick<NewLink, "original_url" | "short_code">;
+export type InsertLink = Pick<
+  NewLink,
+  "original_url" | "short_code" | "link_text"
+>;
 export const insertLinkSchema = createInsertSchema(links, {
   original_url: (schema: z.ZodString) => schema.trim().url(),
   short_code: (schema: z.ZodString) => schema.trim().min(5).max(15),
+  link_text: (schema: z.ZodString) => schema.trim().min(5).max(15),
 }).pick({
   original_url: true,
   short_code: true,
+  link_text: true,
 });
 export const UpdateLinkSchema = insertLinkSchema.partial();
 export const selectLinkSchema = createSelectSchema(links);
