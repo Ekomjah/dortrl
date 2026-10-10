@@ -1,12 +1,27 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, anonymous } from "better-auth/plugins";
 import { db } from "../db/client";
 import * as schema from "../db/schema"; // must export user, session, account, verification
+import { sendEmail } from "./emails/email";
+import { eq } from "drizzle-orm";
+import { links } from "../db/schema";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: { enabled: true },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      console.log("VERIFY CALLBACK FIRED", user.email, url);
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Click the link to verify your email: ${url}`,
+        html: `<p>Click <a href="${url}">here</a> to verify your email.</p>`,
+      });
+    },
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -17,12 +32,22 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: ["http://localhost:5173"], // your frontend origin
-  plugins: [openAPI()], // dev-only API explorer
+  trustedOrigins: [process.env.FRONTEND_URL!], // your frontend origin
+  plugins: [
+    openAPI(),
+    anonymous({
+      onLinkAccount: async ({
+        anonymousUser,
+        newUser,
+      }: {
+        anonymousUser: any;
+        newUser: any;
+      }) => {
+        await db
+          .update(links)
+          .set({ user_id: newUser.user.id })
+          .where(eq(links.user_id, anonymousUser.user.id));
+      },
+    }),
+  ], // dev-only API explorer
 });
-
-// export const auth = betterAuth({
-//   database: drizzleAdapter(db, {
-//     provider: "sqlite",
-//   }),
-// });
