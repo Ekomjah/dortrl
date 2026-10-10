@@ -6,7 +6,14 @@ import { fileURLToPath } from "node:url";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { afterAll, afterEach, beforeAll } from "vitest";
+import { afterAll, afterEach, beforeAll, vi } from "vitest";
+
+// `hono/bun` destructures the `Bun` global at module scope, which throws under
+// vitest's Node worker pool. Only `getConnInfo` is actually used, and it is
+// runtime-agnostic, so stand in a fixed address instead.
+vi.mock("hono/bun", () => ({
+  getConnInfo: () => ({ remote: { address: "127.0.0.1" } }),
+}));
 
 // Point the app's db client at a throwaway sqlite file BEFORE it is imported.
 // dotenv (loaded inside db/client) does not override already-set env vars, so
