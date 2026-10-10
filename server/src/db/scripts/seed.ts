@@ -47,9 +47,14 @@ async function seedDatabase() {
   await db.delete(schema.clicks); // removes ALL rows from clicks
   await db.delete(schema.links); // removes ALL rows from links
 
+  const [seedUser] = await db.select({ id: schema.user.id }).from(schema.user).limit(1);
+  if (!seedUser) {
+    throw new Error("Seed needs at least one user; sign up in the app first.");
+  }
+
   const insertedLinks = await db
     .insert(schema.links)
-    .values(seedLinks)
+    .values(seedLinks.map((link) => ({ ...link, user_id: seedUser.id })))
     .returning();
 
   for (let i = 0; i < clickBatches.length; i++) {
