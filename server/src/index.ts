@@ -2,6 +2,7 @@ import { cors } from "hono/cors";
 import type { ApiResponse } from "shared";
 import { Hono } from "hono";
 import { ReasonPhrases, StatusCodes } from "shared";
+import { ConflictError } from "./lib/errors";
 import { requestLogger } from "./middleware/logger";
 import linksRoute from "./routes/links/links.routes";
 import { linksRepository } from "./routes/links/links.service";
@@ -18,6 +19,9 @@ app.notFound((c) =>
 );
 app.onError((err, c) => {
   console.error(err);
+  if (err instanceof ConflictError) {
+    return c.json({ message: err.message }, StatusCodes.CONFLICT);
+  }
   return c.json(
     { message: ReasonPhrases.INTERNAL_SERVER_ERROR },
     StatusCodes.INTERNAL_SERVER_ERROR,
