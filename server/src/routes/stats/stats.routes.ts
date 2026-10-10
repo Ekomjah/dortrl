@@ -1,8 +1,11 @@
 import { Hono } from "hono";
 import { StatusCodes } from "shared";
+import type { HonoEnv } from "@/lib/types.js";
 import { statsService } from "./stats.service.js";
+import { optionalAuth } from "@/middleware/auth.middleware.js";
 
-const statsRoute = new Hono()
+const statsRoute = new Hono<HonoEnv>()
+  .use(optionalAuth)
   .get("/health", async (c) => {
     const health = await statsService.healthCheck();
     const status =
