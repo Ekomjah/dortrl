@@ -73,12 +73,12 @@ describe('gET /:code (redirect)', () => {
   })
 })
 
-describe('gET /links/:code/stats', () => {
+describe('gET /:code/stats', () => {
   it('returns the click count for a link', async () => {
     const created = await (await createLink('https://stats.test/')).json()
     await app.request(`/${created.short_code}`)
     await app.request(`/${created.short_code}`)
-    const res = await app.request(`/links/${created.short_code}/stats`)
+    const res = await app.request(`/${created.short_code}/stats`)
     expect(res.status).toBe(StatusCodes.OK)
     expect(await res.json()).toMatchObject({ clicks: 2 })
   })
