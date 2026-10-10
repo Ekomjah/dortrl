@@ -20,6 +20,7 @@
     // Module resolution
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
