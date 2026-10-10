@@ -8,7 +8,19 @@ export const idParamSchema = z.object({
 });
 
 export const linkValidators = {
-  create: () => [zValidator("json", insertLinkSchema)] as const,
+  create: () =>
+    [
+      zValidator("json", insertLinkSchema, (result, c) => {
+        if (!result.success) {
+          return c.json(
+            {
+              errors: result.error.issues.map((issue) => issue.message),
+            },
+            400,
+          );
+        }
+      }),
+    ] as const,
   update: () =>
     [
       zValidator("param", idParamSchema),
