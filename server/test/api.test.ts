@@ -70,6 +70,97 @@ describe('pOST /links', () => {
   })
 })
 
+describe('link_text addressing', () => {
+  async function createWithText(url: string, link_text?: string) {
+    const res = await authed('/links', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ original_url: url, link_text }),
+    })
+    return res
+  }
+
+  it('resolves both the link_text and the short_code to the same row', async () => {
+    const res = await createWithText('https://dual.test/', 'my-slug')
+    expect(res.status).toBe(StatusCodes.CREATED)
+    const body = await res.json()
+    expect(body.link_text).toBe('my-slug')
+
+    const viaText = await app.request('/my-slug')
+    const viaCode = await app.request(`/${body.short_code}`)
+    expect(viaText.status).toBe(StatusCodes.MOVED_TEMPORARILY)
+    expect(viaCode.status).toBe(StatusCodes.MOVED_TEMPORARILY)
+    expect(viaText.headers.get('location')).toBe('https://dual.test/')
+    expect(viaCode.headers.get('location')).toBe('https://dual.test/')
+  })
+
+  it('still resolves the short_code when no link_text is given', async () => {
+    const res = await createWithText('https://codeonly.test/')
+    expect(res.status).toBe(StatusCodes.CREATED)
+    const body = await res.json()
+    expect(body.link_text).toBeNull()
+
+    const viaCode = await app.request(`/${body.short_code}`)
+    expect(viaCode.status).toBe(StatusCodes.MOVED_TEMPORARILY)
+    expect(viaCode.headers.get('location')).toBe('https://codeonly.test/')
+  })
+
+  it('preserves the case of link_text', async () => {
+    const res = await createWithText('https://mixedcase.test/', 'MySlug')
+    expect(res.status).toBe(StatusCodes.CREATED)
+    expect((await res.json()).link_text).toBe('MySlug')
+
+    const viaExact = await app.request('/MySlug')
+    expect(viaExact.status).toBe(StatusCodes.MOVED_TEMPORARILY)
+  })
+
+  it('rejects a link_text already used by another link', async () => {
+    expect((await createWithText('https://first.test/', 'taken')).status).toBe(StatusCodes.CREATED)
+    const second = await createWithText('https://second.test/', 'taken')
+    expect(second.status).toBe(StatusCodes.CONFLICT)
+  })
+
+  it('rejects a link_text that collides with an existing short_code', async () => {
+    const first = await (await createWithText('https://collide.test/')).json()
+    const second = await createWithText('https://collide2.test/', first.short_code)
+    expect(second.status).toBe(StatusCodes.CONFLICT)
+  })
+
+  it('rejects reserved link_text values', async () => {
+    for (const reserved of ['health', 'links', 'stats']) {
+      const res = await createWithText(`https://reserved-${reserved}.test/`, reserved)
+      expect(res.status, reserved).toBe(StatusCodes.CONFLICT)
+    }
+  })
+
+  it('rejects a link_text outside the short_code length rules', async () => {
+    // `api` is reserved but also too short, so length rejects it first.
+    const short = await createWithText('https://tooshort.test/', 'api')
+    expect(short.status).toBe(StatusCodes.BAD_REQUEST)
+  })
+
+  it('rejects a duplicate short_code on update with a conflict', async () => {
+    const a = await (await createWithText('https://upd-a.test/')).json()
+    const b = await (await createWithText('https://upd-b.test/')).json()
+    const res = await authed(`/links/${b.short_code}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ short_code: a.short_code }),
+    })
+    expect(res.status).toBe(StatusCodes.CONFLICT)
+  })
+
+  it('serves stats by short_code only, never by link_text', async () => {
+    const body = await (await createWithText('https://statsby.test/', 'statstext')).json()
+    await app.request(`/${body.short_code}`)
+    const byCode = await authed(`/${body.short_code}/stats`)
+    expect(byCode.status).toBe(StatusCodes.OK)
+
+    const byText = await authed('/statstext/stats')
+    expect(byText.status).toBe(StatusCodes.NOT_FOUND)
+  })
+})
+
 describe('gET /links', () => {
   it('lists all created links', async () => {
     await createLink('https://a.test/')
