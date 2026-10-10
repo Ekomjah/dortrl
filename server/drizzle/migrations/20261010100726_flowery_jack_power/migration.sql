@@ -1,0 +1,1 @@
+ALTER TABLE `links` ADD `user_id` text NOT NULL REFERENCES user(id) ON DELETE CASCADE;

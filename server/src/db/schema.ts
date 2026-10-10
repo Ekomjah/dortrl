@@ -9,11 +9,15 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { generateId } from "shared";
+import { user } from "./auth-schema";
 
 export const links = sqliteTable(
   "links",
   {
     id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    user_id: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     short_code: text("short_code")
       .unique()
       .$defaultFn(() => generateId(15))
@@ -64,4 +68,4 @@ export const selectLinkSchema = createSelectSchema(links);
 export type Click = typeof clicks.$inferInsert;
 export type SelectClick = Omit<Click, "link_id" | "id">;
 export type InsertClicks = Omit<Click, "id" | "clicked_at">;
-export * from './auth-schema'
+export * from "./auth-schema";
