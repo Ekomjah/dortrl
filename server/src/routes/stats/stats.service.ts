@@ -50,9 +50,12 @@ export const statsService = {
     }
   },
 
-  clicksStats: async (code: string): Promise<statsClicks | undefined> => {
+  clicksStats: async (
+    code: string,
+    userId: string,
+  ): Promise<statsClicks | undefined> => {
     const link = await db.query.links.findFirst({
-      where: { short_code: code },
+      where: { short_code: code, user_id: userId },
       with: {
         clicks: true,
       },

@@ -2,7 +2,10 @@ import { Hono } from "hono";
 import { StatusCodes } from "shared";
 import type { HonoEnv } from "@/lib/types.js";
 import { statsService } from "./stats.service.js";
-import { optionalAuth } from "@/middleware/auth.middleware.js";
+import {
+  optionalAuth,
+  requireFullAccount,
+} from "@/middleware/auth.middleware.js";
 
 const statsRoute = new Hono<HonoEnv>()
   .use(optionalAuth)
@@ -13,9 +16,10 @@ const statsRoute = new Hono<HonoEnv>()
 
     return c.json(health, status);
   })
-  .get("/:code/stats", async (c) => {
+  .get("/:code/stats", requireFullAccount, async (c) => {
+    const user = c.get("user");
     const { code } = c.req.param();
-    const link = await statsService.clicksStats(code);
+    const link = await statsService.clicksStats(code, user.id);
 
     if (!link) {
       return c.json({ message: "Link not found" }, StatusCodes.NOT_FOUND);
