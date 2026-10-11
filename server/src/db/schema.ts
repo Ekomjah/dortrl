@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import { z } from "zod";
 import { sql } from "drizzle-orm";
 import {
   check,
@@ -28,9 +28,7 @@ export const links = sqliteTable(
     created_at: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(unixepoch())`),
-    expires_at: integer("expires_at", { mode: "timestamp" }).default(
-      sql`(unixepoch('now', '+5 days'))`,
-    ),
+    expires_at: integer("expires_at", { mode: "timestamp" }),
   },
   (table) => [
     index("original_url_idx").on(table.original_url),
@@ -68,11 +66,17 @@ export type InsertLink = Pick<
 export const insertLinkSchema = createInsertSchema(links, {
   original_url: (schema: z.ZodString) => schema.trim().url(),
   short_code: (schema: z.ZodString) => schema.trim().min(5).max(15),
-  link_text: (schema: z.ZodString) => schema.trim().min(5).max(15),
+  link_text: (schema: z.ZodString) => schema.trim().min(5).max(15).optional(),
+  expires_at: z.iso
+    .datetime({ offset: true })
+    .transform((s) => new Date(s))
+    .refine((d) => d > new Date(), { message: "Must be a future date" })
+    .optional(),
 }).pick({
   original_url: true,
   short_code: true,
   link_text: true,
+  expires_at: true,
 });
 export const UpdateLinkSchema = insertLinkSchema.partial();
 export const selectLinkSchema = createSelectSchema(links);

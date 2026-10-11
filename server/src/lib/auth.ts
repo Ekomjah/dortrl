@@ -13,7 +13,6 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
-      console.log("VERIFY CALLBACK FIRED", user.email, url);
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
