@@ -1,5 +1,4 @@
 import { cors } from "hono/cors";
-import type { ApiResponse } from "shared";
 import { Hono } from "hono";
 import { ReasonPhrases, StatusCodes } from "shared";
 import { ConflictError } from "./lib/errors";
