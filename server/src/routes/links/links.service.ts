@@ -2,24 +2,13 @@ import type { InsertLink, NewLink, SelectLink } from "../../db/schema.js";
 import { db } from "../../db/client.js";
 import { links } from "../../db/schema.js";
 import { ConflictError } from "../../lib/errors.js";
-import {
-  and,
-  eq,
-  ne,
-  or,
-} from "drizzle-orm/sql/expressions/conditions";
+import { and, eq, ne, or } from "drizzle-orm/sql/expressions/conditions";
 import { count, desc } from "drizzle-orm";
 import { generateId } from "shared";
 
-// `link_text` and `short_code` share one flat namespace because the public
-// redirect is a single catch-all segment, so neither may shadow the other.
-// Reserved values are those already claimed by a top-level route registered
-// ahead of the catch-all; `api` is listed defensively even though its length
-// keeps it unreachable today.
 const RESERVED_TEXT = new Set(["health", "links", "api", "stats"]);
 
-const normalizeText = (value?: string | null) =>
-  value ? value.trim() : null;
+const normalizeText = (value?: string | null) => (value ? value.trim() : null);
 
 const assertReserved = (text: string | null) => {
   if (text && RESERVED_TEXT.has(text)) {
@@ -27,8 +16,6 @@ const assertReserved = (text: string | null) => {
   }
 };
 
-// Claims `identifier` if any other row already uses it as a short_code or a
-// link_text. `excludeCode` skips the row being updated so a no-op save works.
 const assertAvailable = async (identifier: string, excludeCode?: string) => {
   const taken = await db
     .select({ id: links.id })
@@ -54,9 +41,9 @@ export const linksRepository = {
     const short_code = input.short_code || generateId(15);
     const link_text = normalizeText(input.link_text);
 
-    assertReserved(link_text);
     await assertAvailable(short_code);
     if (link_text) {
+      assertReserved(link_text);
       await assertAvailable(link_text);
     }
 
@@ -83,6 +70,7 @@ export const linksRepository = {
     return userLinks;
   },
   getLink: async (identifier: string): Promise<SelectLink | undefined> => {
+    const today = new Date();
     const link = await db
       .select()
       .from(links)
@@ -90,6 +78,13 @@ export const linksRepository = {
         or(eq(links.short_code, identifier), eq(links.link_text, identifier)),
       )
       .get();
+    if (!link) throw new ConflictError("Link doesn't exist");
+    if (link.expires_at) {
+      const linkExpiryDate = new Date(link.expires_at);
+      if (today > linkExpiryDate) {
+        throw new ConflictError("Link has expired");
+      }
+    }
     return link;
   },
   updateLink: async (
@@ -99,8 +94,8 @@ export const linksRepository = {
   ): Promise<SelectLink | undefined> => {
     if (input.link_text !== undefined) {
       const link_text = normalizeText(input.link_text);
-      assertReserved(link_text);
       if (link_text) {
+        assertReserved(link_text);
         await assertAvailable(link_text, code);
       }
       input = { ...input, link_text };

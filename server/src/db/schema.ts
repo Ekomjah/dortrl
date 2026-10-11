@@ -28,9 +28,9 @@ export const links = sqliteTable(
     created_at: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(unixepoch())`),
-    expires_at: integer("expires_at", { mode: "timestamp" })
-      .notNull()
-      .default(sql`(unixepoch('now', '+5 days'))`),
+    expires_at: integer("expires_at", { mode: "timestamp" }).default(
+      sql`(unixepoch('now', '+5 days'))`,
+    ),
   },
   (table) => [
     index("original_url_idx").on(table.original_url),
