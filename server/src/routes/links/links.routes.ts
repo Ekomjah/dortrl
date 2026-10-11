@@ -70,10 +70,7 @@ const linksRoute = new Hono<HonoEnv>()
       const user = c.get("user")!;
       const deleted = await linksRepository.deleteLink(code, user.id);
       if (!deleted) {
-        return c.json(
-          { message: ReasonPhrases.NOT_FOUND },
-          StatusCodes.NOT_FOUND,
-        );
+        return c.json({ message: "Link doesn't exist" }, StatusCodes.NOT_FOUND);
       }
 
       return c.body(null, StatusCodes.NO_CONTENT);
