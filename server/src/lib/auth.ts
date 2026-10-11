@@ -31,7 +31,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [process.env.FRONTEND_URL!], // your frontend origin
+  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:5173"], // your frontend origin
   plugins: [
     openAPI(),
     anonymous({
