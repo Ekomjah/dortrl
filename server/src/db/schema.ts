@@ -61,7 +61,7 @@ export type NewLink = typeof links.$inferInsert;
 export type SelectLink = typeof links.$inferSelect;
 export type InsertLink = Pick<
   NewLink,
-  "original_url" | "short_code" | "link_text"
+  "original_url" | "short_code" | "link_text" | "expires_at"
 >;
 export const insertLinkSchema = createInsertSchema(links, {
   original_url: (schema: z.ZodString) => schema.trim().url(),
