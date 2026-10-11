@@ -2,7 +2,14 @@ import type { InsertLink, NewLink, SelectLink } from "../../db/schema.js";
 import { db } from "../../db/client.js";
 import { links } from "../../db/schema.js";
 import { ConflictError } from "../../lib/errors.js";
-import { and, eq, ne, or } from "drizzle-orm/sql/expressions/conditions";
+import {
+  and,
+  eq,
+  isNotNull,
+  lt,
+  ne,
+  or,
+} from "drizzle-orm/sql/expressions/conditions";
 import { count, desc } from "drizzle-orm";
 import { generateId } from "shared";
 
@@ -38,7 +45,7 @@ export const linksRepository = {
     input: InsertLink,
     userId: string,
   ): Promise<NewLink> => {
-    const short_code = input.short_code || generateId(15);
+    const short_code = input.short_code || generateId(10);
     const link_text = normalizeText(input.link_text);
 
     await assertAvailable(short_code);
@@ -128,5 +135,13 @@ export const linksRepository = {
       .from(links)
       .where(eq(links.user_id, userId));
     return row?.n ?? 0;
+  },
+  deleteExpiredLinks: async (): Promise<number> => {
+    const today = new Date();
+    const deletedLinks = await db
+      .delete(links)
+      .where(and(isNotNull(links.expires_at), lt(links.expires_at, today)))
+      .returning({ id: links.id });
+    return deletedLinks.length;
   },
 };
