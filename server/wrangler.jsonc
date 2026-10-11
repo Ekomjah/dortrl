@@ -1,0 +1,17 @@
+{
+  "name": "dortrl-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],"vars": {
+  "FRONTEND_URL": "http://your-frontend.pages.dev"
+},
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dortrl-db",
+      "database_id": "9e3c9a79-0991-4a85-b517-4519bdbe3917",
+      "migrations_dir": "drizzle/migrations",
+      "migrations_pattern": "drizzle/migrations/*/migration.sql"
+    }
+  ]
+}
