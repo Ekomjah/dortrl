@@ -25,7 +25,7 @@ const linksRoute = new Hono<HonoEnv>()
   })
   .post(
     "/",
-    createLinkLimiter,
+    createLinkLimiter(),
     requireUser,
     enforceLinkLimit,
     ...linkValidators.create(),
