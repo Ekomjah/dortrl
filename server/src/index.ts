@@ -11,7 +11,7 @@ import { auth } from "./lib/auth";
 
 const app = new Hono({ strict: false });
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL!, credentials: true }));
 app.use(requestLogger());
 app.notFound((c) =>
   c.json({ message: ReasonPhrases.NOT_FOUND }, StatusCodes.NOT_FOUND),
