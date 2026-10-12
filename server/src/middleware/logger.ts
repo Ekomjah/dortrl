@@ -2,20 +2,10 @@ import type { MiddlewareHandler } from 'hono'
 import process from 'node:process'
 import pino from 'pino'
 
-const environment = process.env.APP_ENV ?? 'development'
-
+// No `transport`: pino spawns a worker thread for it, which workerd does not
+// support. Plain JSON on stdout is what Workers log pipelines expect anyway.
 const appLogger = pino({
   level: process.env.LOG_LEVEL ?? 'info',
-  transport:
-    environment === 'development'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-          },
-        }
-      : undefined,
 })
 
 export const requestLogger = (): MiddlewareHandler => {
