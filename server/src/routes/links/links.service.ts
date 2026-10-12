@@ -85,7 +85,7 @@ export const linksRepository = {
         or(eq(links.short_code, identifier), eq(links.link_text, identifier)),
       )
       .get();
-    if (!link) throw new ConflictError("Link doesn't exist");
+    if (!link) throw new ConflictError("Link doesn't exist", 404);
     if (link.expires_at) {
       const linkExpiryDate = new Date(link.expires_at);
       if (today > linkExpiryDate) {

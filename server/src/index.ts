@@ -19,7 +19,7 @@ app.notFound((c) =>
 app.onError((err, c) => {
   console.error(err);
   if (err instanceof ConflictError) {
-    return c.json({ message: err.message }, StatusCodes.CONFLICT);
+    return c.json({ message: err.message }, err.status);
   }
   return c.json(
     { message: ReasonPhrases.INTERNAL_SERVER_ERROR },
