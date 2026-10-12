@@ -49,8 +49,8 @@ function Index() {
 					alt="beaver logo"
 				/>
 			</a>
-			<h1 className="text-5xl font-black">bhvr</h1>
-			<h2 className="text-2xl font-bold">Bun + Hono + Vite + React</h2>
+			<h1 className="text-5xl font-black">Dortrl</h1>
+			<h2 className="text-2xl font-bold">A URL shortener and Link management system</h2>
 			<p>A typesafe fullstack monorepo</p>
 			<div className="flex items-center gap-4">
 				<Button onClick={() => sendRequest()}>Call API</Button>

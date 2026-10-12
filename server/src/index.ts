@@ -31,7 +31,7 @@ app.onError((err, c) => {
 app.get("/", (c) => {
   return c.json({ id: 1, text: "Hello Hono!" });
 });
-
+app.get("/favicon.ico", (c) => c.body(null, 204));
 app.route("/", statsRoute);
 app.route("/links", linksRoute);
 
