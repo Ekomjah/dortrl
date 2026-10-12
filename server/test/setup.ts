@@ -1,37 +1,13 @@
-import type { Client } from "@libsql/client";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import process from "node:process";
-import { fileURLToPath } from "node:url";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import { env } from "cloudflare:workers";
+import { afterEach, beforeAll, vi } from "vitest";
 
-// `hono/bun` destructures the `Bun` global at module scope, which throws under
-// vitest's Node worker pool. Only `getConnInfo` is actually used, and it is
-// runtime-agnostic, so stand in a fixed address instead.
+// `hono/bun` destructures the `Bun` global at module scope, which doesn't
+// exist in workerd. Only `getConnInfo` is used, so stand in a fixed address.
 vi.mock("hono/bun", () => ({
   getConnInfo: () => ({ remote: { address: "127.0.0.1" } }),
 }));
 
-// Point the app's db client at a throwaway sqlite file BEFORE it is imported.
-// dotenv (loaded inside db/client) does not override already-set env vars, so
-// this wins over the repo `.env`.
-const dbPath = join(tmpdir(), `quickrl-hono-test-${process.pid}.db`);
-process.env.DB_FILE_NAME = `file:${dbPath}`;
-process.env.DB_AUTH_TOKEN = "";
-process.env.APP_ENV = "test";
-
-// Migrations are applied in order by drizzle's own migrator, which sorts the
-// migration folders by name and skips any already recorded in the journal table.
-const migrationsDir = fileURLToPath(
-  new URL("../drizzle/migrations", import.meta.url),
-);
-
-let client: Client;
-
-const TABLES_IN_DROP_ORDER = [
+const TABLES_IN_DELETE_ORDER = [
   "clicks",
   "account",
   "session",
@@ -40,30 +16,15 @@ const TABLES_IN_DROP_ORDER = [
   "user",
 ] as const;
 
-async function existingTables(): Promise<Set<string>> {
-  const res = await client.execute(
-    "SELECT name FROM sqlite_master WHERE type='table'",
-  );
-  return new Set(res.rows.map((row) => String(row.name)));
-}
-
 beforeAll(async () => {
-  client = createClient({ url: `file:${dbPath}` });
-  for (const table of TABLES_IN_DROP_ORDER) {
-    await client.execute(`DROP TABLE IF EXISTS \`${table}\``);
-  }
-  await migrate(drizzle({ client }), { migrationsFolder: migrationsDir });
+  const statements: string[] = JSON.parse(
+    (env as unknown as { TEST_MIGRATIONS: string }).TEST_MIGRATIONS,
+  );
+  await env.DB.batch(statements.map((sql) => env.DB.prepare(sql)));
 });
 
 afterEach(async () => {
-  const present = await existingTables();
-  for (const table of TABLES_IN_DROP_ORDER) {
-    if (present.has(table)) {
-      await client.execute(`DELETE FROM \`${table}\``);
-    }
-  }
-});
-
-afterAll(() => {
-  client?.close();
+  await env.DB.batch(
+    TABLES_IN_DELETE_ORDER.map((t) => env.DB.prepare(`DELETE FROM \`${t}\``)),
+  );
 });

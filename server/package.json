@@ -37,10 +37,11 @@
     "node-cron": "^4.6.0",
     "pino": "^10.3.1",
     "shared": "workspace:*",
-    "vitest": "^5.0.1",
+    "vitest": "^4.1.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.23.0",
     "@types/node": "^26.6.5",
     "drizzle-kit": "1.0.0-rc.4",
     "wrangler": "^4.149.0"
