@@ -8,6 +8,7 @@ import { linksRepository } from "./routes/links/links.service";
 import statsRoute from "./routes/stats/stats.routes";
 import { statsService } from "./routes/stats/stats.service";
 import { auth } from "./lib/auth";
+import { runLinkCleanup } from "./jobs/link-cleanup";
 
 const app = new Hono({ strict: false });
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
@@ -53,4 +54,9 @@ app.get("/:code", async (c) => {
   return c.redirect(link.original_url, StatusCodes.MOVED_TEMPORARILY);
 });
 export { app };
-export default app;
+export default {
+  fetch: app.fetch,
+  scheduled: async () => {
+    await runLinkCleanup();
+  },
+};

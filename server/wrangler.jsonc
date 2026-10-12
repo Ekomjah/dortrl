@@ -2,17 +2,21 @@
   "name": "dortrl-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
-  "compatibility_flags": ["nodejs_compat"],"vars": {
-  "FRONTEND_URL": "http://localhost:5173"
-},
-"observability": {
-  "enabled": true,
-  "head_sampling_rate": 1,
-  "logs": {
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "FRONTEND_URL": "http://localhost:5173"
+  },
+  "triggers": {
+    "crons": ["0 */4 * * *"]
+  },
+  "observability": {
     "enabled": true,
-    "invocation_logs": true
-  }
-},
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  },
   "ratelimits": [
     {
       "name": "LINK_RATE_LIMITER",
