@@ -1,0 +1,57 @@
+import { Link } from "react-router";
+import { Button } from "@/components/ui/button";
+
+const solid =
+  "h-9 gap-1.5 rounded-lg border border-[#0a4fb8] bg-linear-to-b from-[#1f6fe0] to-[#0a54c4] px-4 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_rgb(0_0_0/0.15)] transition-colors hover:from-[#2a7af0] hover:to-[#0d5ed6] active:translate-y-px active:shadow-inner focus-visible:ring-2 focus-visible:ring-[#1f6fe0]/40 focus-visible:ring-offset-2";
+
+const outline =
+  "h-9 gap-1.5 rounded-lg border border-[#1f6fe0]/35 px-4 text-sm font-medium text-[#1f6fe0] shadow-none transition-colors hover:border-[#1f6fe0]/60 hover:bg-[#1f6fe0]/10 active:translate-y-px focus-visible:ring-2 focus-visible:ring-[#1f6fe0]/40 focus-visible:ring-offset-2 dark:border-[#6ba4f5]/40 dark:text-[#6ba4f5] dark:hover:bg-[#6ba4f5]/10";
+
+const solidOnBlue =
+  "h-9 gap-1.5 rounded-lg border border-white bg-white px-4 text-sm font-semibold text-[#0a54c4] shadow-[0_1px_2px_rgb(0_0_0/0.18)] transition-colors hover:bg-white/90 active:translate-y-px focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a54c4]";
+
+const outlineOnBlue =
+  "h-9 gap-1.5 rounded-lg border border-white/55 px-4 text-sm font-medium text-white shadow-none transition-colors hover:border-white/80 hover:bg-white/12 active:translate-y-px focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a54c4]";
+
+interface CustomBtnProps {
+  text?: string;
+  type?: "submit" | "button" | "reset";
+  to?: string;
+  variant?: "solid" | "outline";
+  tone?: "light" | "onBlue";
+  className?: string;
+}
+
+export default function CustomBtn({
+  text = "Submit",
+  type = "submit",
+  to,
+  variant = "solid",
+  tone = "light",
+  className,
+}: CustomBtnProps) {
+  const styles =
+    tone === "onBlue"
+      ? variant === "solid"
+        ? solidOnBlue
+        : outlineOnBlue
+      : variant === "solid"
+        ? solid
+        : outline;
+
+  const cls = className ? `${styles} ${className}` : styles;
+
+  if (to) {
+    return (
+      <Button asChild className={cls}>
+        <Link to={to}>{text}</Link>
+      </Button>
+    );
+  }
+
+  return (
+    <Button type={type} className={cls}>
+      {text}
+    </Button>
+  );
+}
