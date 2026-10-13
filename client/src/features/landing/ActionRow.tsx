@@ -11,7 +11,7 @@ export interface LandingAction {
 export const LANDING_ACTIONS: LandingAction[] = [
   { label: "Create an account", to: "/sign-up", variant: "solid" },
   { label: "Log in", to: "/login", variant: "outline" },
-  { label: "Continue as guest", type: "button", variant: "outline", badge: "soon" },
+  { label: "Continue as guest", type: "button", variant: "outline" },
 ];
 
 export function ActionRow({
@@ -36,15 +36,6 @@ export function ActionRow({
             variant={action.variant}
             tone={tone}
           />
-          {action.badge ? (
-            <span
-              className={`font-mono text-[11px] uppercase tracking-[0.14em] ${
-                tone === "onBlue" ? "text-white/70" : "text-muted-foreground"
-              }`}
-            >
-              {action.badge}
-            </span>
-          ) : null}
         </span>
       ))}
     </div>

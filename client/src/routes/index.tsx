@@ -11,8 +11,8 @@ import CustomBtn from "@/features/Button";
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="border-b border-border bg-[radial-gradient(70%_55%_at_50%_-10%,rgba(31,111,224/0.10),transparent)]">
+    <div className="bg-background text-foreground min-h-screen">
+      <div className="border-border border-b bg-[radial-gradient(70%_55%_at_50%_-10%,rgba(31,111,224/0.10),transparent)]">
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <span className="flex items-center gap-2.5">
             <img src={beaver} alt="" className="size-7" />
@@ -20,18 +20,18 @@ function App() {
           </span>
           <Link
             to="/login"
-            className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
+            className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
           >
             <CustomBtn type="button" text="Login" />
           </Link>
         </header>
 
-        <div className="mx-auto grid max-w-6xl gap-14 px-6 pb-24 pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:items-center lg:gap-16 lg:pb-32">
+        <div className="mx-auto grid max-w-6xl gap-14 px-6 pt-12 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:items-center lg:gap-16 lg:pb-32">
           <div>
-            <h1 className="mt-5 text-5xl font-black leading-[0.95] tracking-[-0.035em] sm:text-6xl">
+            <h1 className="mt-5 text-5xl leading-[0.95] font-black tracking-[-0.035em] sm:text-6xl">
               Short links you can say out loud.
             </h1>
-            <p className="mt-5 max-w-lg text-lg text-foreground/70">
+            <p className="text-foreground/70 mt-5 max-w-lg text-lg">
               Dortrl turns a long URL into a six-character alias, then tells you
               who clicked it, when, and from where.
             </p>
@@ -54,9 +54,6 @@ function App() {
             Shorten your first link in under a minute.
           </h2>
           <ActionRow actions={LANDING_ACTIONS} tone="onBlue" />
-          <p className="font-mono text-xs uppercase tracking-[0.16em] text-white/70">
-            free · no credit card
-          </p>
         </div>
       </section>
     </div>
