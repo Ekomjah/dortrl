@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 
@@ -28,6 +29,7 @@ interface CustomBtnProps {
   variant?: "solid" | "outline";
   tone?: "light" | "onBlue";
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export default function CustomBtn({
@@ -36,6 +38,7 @@ export default function CustomBtn({
   to,
   variant = "solid",
   tone = "light",
+  onClick,
   className,
 }: CustomBtnProps) {
   const styles =
@@ -51,14 +54,14 @@ export default function CustomBtn({
 
   if (to) {
     return (
-      <Button asChild className={cls}>
+      <Button asChild onClick={onClick} className={cls}>
         <Link to={to}>{text}</Link>
       </Button>
     );
   }
 
   return (
-    <Button type={type} className={cls}>
+    <Button type={type} onClick={onClick} className={cls}>
       {text}
     </Button>
   );

@@ -1,13 +1,13 @@
 import type { RouteObject } from "react-router";
 import App from "./index";
+import Dashboard from "./dashboard";
+import { ProtectedRoute } from "./protected";
 import { LoginForm } from "@/features/LoginForm";
 
-import {
-  isRouteErrorResponse,
-  useRouteError,
-  Link,
-} from "react-router";
+import { isRouteErrorResponse, useRouteError, Link } from "react-router";
+import { SignUpForm } from "@/features/SignUp";
 
+// eslint-disable-next-line
 function RouteError() {
   const error = useRouteError();
   const message = isRouteErrorResponse(error)
@@ -19,7 +19,7 @@ function RouteError() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3">
       <h1 className="text-xl font-semibold">Something went wrong</h1>
-      <p className="text-sm text-muted-foreground">{message}</p>
+      <p className="text-muted-foreground text-sm">{message}</p>
       <Link to="/" className="underline">
         Go home
       </Link>
@@ -34,40 +34,27 @@ export const routes: RouteObject[] = [
     errorElement: <RouteError />,
   },
   {
+    path: "/sign-up",
+    element: <SignUpForm />,
+  },
+  {
     path: "/login",
     element: <LoginForm />,
   },
-  //   {
-  //     path: "/dashboard",
-  //     element: <ProtectedRoute />,
-  //     children: [
-  //       {
-  //         element: <AppShell />,
-  //         children: [
-  //           {
-  //             index: true,
-  //             element: <Navigate to="history" replace />,
-  //           },
-  //           {
-  //             path: "history",
-  //             element: <HistoryPage />,
-  //           },
-  //           {
-  //             path: "search",
-  //             element: <SearchPage />,
-  //           },
-  //           {
-  //             path: "settings",
-  //             element: <SettingsPage />,
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
+  {
+    path: "/dashboard",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+    ],
+  },
   {
     path: "*",
     element: (
-      <div className="text-2xl font-bold min-h-screen w-full flex items-center justify-center">
+      <div className="flex min-h-screen w-full items-center justify-center text-2xl font-bold">
         (404) Page Not Found
       </div>
     ),

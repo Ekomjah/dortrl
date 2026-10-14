@@ -11,12 +11,12 @@ import { auth } from "./lib/auth";
 import { runLinkCleanup } from "./jobs/link-cleanup";
 
 const app = new Hono({ strict: false });
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 app.use(cors({ origin: process.env.FRONTEND_URL!, credentials: true }));
 app.use(requestLogger());
 app.notFound((c) =>
   c.json({ message: ReasonPhrases.NOT_FOUND }, StatusCodes.NOT_FOUND),
 );
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 app.onError((err, c) => {
   console.error(err);
   if (err instanceof ConflictError) {
