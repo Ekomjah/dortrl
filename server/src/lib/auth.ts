@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, anonymous } from "better-auth/plugins";
 import { db } from "../db/client";
-import * as schema from "../db/schema"; // must export user, session, account, verification
+import * as schema from "../db/schema"; 
 import { sendEmail } from "./emails/email";
 import { eq } from "drizzle-orm";
 import { links } from "../db/schema";
@@ -31,7 +31,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:5173"], // your frontend origin
+  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:5173"], 
   plugins: [
     openAPI(),
     anonymous({
