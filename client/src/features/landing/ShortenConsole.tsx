@@ -10,8 +10,20 @@ const CODE_LENGTH = 6;
 const SAMPLE =
   "https://github.com/stevedylandev/bhvr/releases/tag/v0.4.0?utm_source=newsletter&utm_medium=email";
 
-function shortCode() {
-  return "asdfnaet";
+function shortCode(seed: string) {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+
+  let out = "";
+  h >>>= 0;
+  for (let i = 0; i < CODE_LENGTH; i += 1) {
+    out += ALPHABET[h % ALPHABET.length];
+    h = Math.imul(h, 2654435761) >>> 0;
+  }
+  return out;
 }
 
 export function ShortenConsole() {
@@ -19,7 +31,7 @@ export function ShortenConsole() {
   const [target, setTarget] = useState(SAMPLE);
   const [resolving, setResolving] = useState(false);
 
-  const code = shortCode();
+  const code = useMemo(() => shortCode(target), [target]);
   const alias = `${HOST}/${code}`;
   const trimmed = target.trim();
   const empty = trimmed.length === 0;
