@@ -11,7 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import CustomBtn from "./Button";
 import { Eye, EyeOff } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { useNavigate } from "react-router";
+import { authClient } from "@/lib/auth/auth-client";
 
 interface TextInputValueChange {
   target: {
@@ -28,17 +31,36 @@ export function LoginForm() {
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState<SignUpFormState["email"]>("");
   const [password, setPassword] = useState<SignUpFormState["password"]>("");
+  const [rememberUser, setRememberUser] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const changeEmail = (e: TextInputValueChange) => setEmail(e.target.value);
   const changePassword = (e: TextInputValueChange) =>
     setPassword(e.target.value);
 
-  const handleSubmit = async (e) =>{
-    e.preventDefault()
-    setLoading(true)
-    try{}
-  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await authClient.signIn.email({
+        email: email,
+        password: password,
+        rememberMe: rememberUser,
+        callbackURL: `${window.location.origin}/`,
+      });
+      if (error) {
+        setFormError(error.message ?? "Could not create your account");
+        return;
+      }
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Sign-up failed:", err);
+      setFormError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-md bg-gray-100 p-8 shadow-lg">
@@ -79,13 +101,28 @@ export function LoginForm() {
                       {isVisible ? <Eye className="w-full" /> : <EyeOff />}
                     </Button>
                   </div>
+                </Field>{" "}
+                <Field orientation="horizontal">
+                  <Checkbox
+                    checked={rememberUser}
+                    onCheckedChange={(checked) =>
+                      setRememberUser(checked === true)
+                    }
+                    id="remember-me"
+                    name="remember-me"
+                  />
+                  <FieldLabel htmlFor="remember-me">Remember me?</FieldLabel>
                 </Field>
               </FieldGroup>
             </FieldSet>
             <FieldSeparator />
 
             <Field orientation="horizontal">
-              <CustomBtn text="Submit" type="submit" />
+              <CustomBtn
+                disabled={loading}
+                text={loading ? "Submitting" : "Submit"}
+                type="submit"
+              />
               <Button
                 variant="outline"
                 type="reset"
@@ -96,6 +133,7 @@ export function LoginForm() {
             </Field>
           </FieldGroup>
         </form>
+        <p className="text-md mt-8 text-red-500">{formError && formError}</p>
       </div>
     </div>
   );

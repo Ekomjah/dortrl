@@ -22,20 +22,22 @@ export const CAPABILITIES: Capability[] = [
   },
 ];
 
-export function CapabilityList({ items = CAPABILITIES }: { items?: Capability[] }) {
+export function CapabilityList({
+  items = CAPABILITIES,
+}: {
+  items?: Capability[];
+}) {
   return (
-    <dl className="divide-y divide-border border-y border-border">
+    <dl className="divide-border border-border divide-y border-y">
       {items.map((item) => (
         <div
           key={item.label}
           className="grid gap-x-10 gap-y-2 py-8 md:grid-cols-[8rem_minmax(0,1fr)]"
         >
-          <dt className="font-label text-xl font-medium">
-            {item.label}
-          </dt>
+          <dt className="font-label text-xl font-medium">{item.label}</dt>
           <dd>
             <h3 className="text-lg font-medium tracking-tight">{item.title}</h3>
-            <p className="mt-2 max-w-prose text-foreground/70">{item.body}</p>
+            <p className="text-foreground/70 mt-2 max-w-prose">{item.body}</p>
           </dd>
         </div>
       ))}

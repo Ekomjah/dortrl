@@ -30,6 +30,7 @@ interface CustomBtnProps {
   tone?: "light" | "onBlue";
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
 export default function CustomBtn({
@@ -40,6 +41,7 @@ export default function CustomBtn({
   tone = "light",
   onClick,
   className,
+  disabled = false,
 }: CustomBtnProps) {
   const styles =
     tone === "onBlue"
@@ -54,14 +56,14 @@ export default function CustomBtn({
 
   if (to) {
     return (
-      <Button asChild onClick={onClick} className={cls}>
+      <Button asChild onClick={onClick} className={cls} disabled={disabled}>
         <Link to={to}>{text}</Link>
       </Button>
     );
   }
 
   return (
-    <Button type={type} onClick={onClick} className={cls}>
+    <Button type={type} onClick={onClick} className={cls} disabled={disabled}>
       {text}
     </Button>
   );

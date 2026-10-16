@@ -2,6 +2,7 @@ import { Link } from "react-router";
 
 import beaver from "@/assets/beaver.svg";
 import { ActionRow, LANDING_ACTIONS } from "@/features/landing/ActionRow";
+import { Button } from "@/components/ui/button";
 import {
   CAPABILITIES,
   CapabilityList,
@@ -18,12 +19,22 @@ function App() {
             <img src={beaver} alt="" className="size-7" />
             <span className="text-lg font-black tracking-tight">Dortrl</span>
           </span>
-          <Link
-            to="/login"
-            className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
-          >
-            <CustomBtn type="button" text="Login" />
-          </Link>
+          <div className="flex gap-x-4">
+            <Link
+              to="/sign-up"
+              className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
+            >
+              <CustomBtn type="button" text="Create an Account" />
+            </Link>
+            <Link
+              to="/login"
+              className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
+            >
+              <Button variant="outline" type="button">
+                Login
+              </Button>
+            </Link>
+          </div>
         </header>
 
         <div className="mx-auto grid max-w-6xl gap-14 px-6 pt-12 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:items-center lg:gap-16 lg:pb-32">
