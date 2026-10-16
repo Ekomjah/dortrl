@@ -6,6 +6,9 @@
   "triggers": {
     "crons": ["0 */4 * * *"]
   },
+  "vars": {
+    "FRONTEND_URL": "https://dortrl.vercel.app"
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,

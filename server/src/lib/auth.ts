@@ -31,7 +31,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [process.env.FRONTEND_URL || "http://localhost:5173"], 
+  trustedOrigins: [process.env.SERVER_URL || "http://localhost:5173"], 
   plugins: [
     openAPI(),
     anonymous({
