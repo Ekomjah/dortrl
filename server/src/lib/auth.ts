@@ -48,5 +48,5 @@ export const auth = betterAuth({
           .where(eq(links.user_id, anonymousUser.user.id));
       },
     }),
-  ], // dev-only API explorer
+  ],
 });
