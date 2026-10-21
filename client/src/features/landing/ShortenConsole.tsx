@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import CustomBtn from "@/features/Button";
+import { SHORT_HOST } from "@/lib/api/links";
 
 const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
-const HOST = "dortrl.dev";
+const HOST = SHORT_HOST;
 const CODE_LENGTH = 6;
 
 const SAMPLE =
@@ -57,22 +58,22 @@ export function ShortenConsole() {
           placeholder="https://"
           aria-label="Long URL"
           spellCheck={false}
-          className="font-mono text-sm"
+          className="text-sm tabular-nums"
         />
         <CustomBtn text={resolving ? "Resolving" : "Shorten"} type="submit" />
       </div>
 
       <div className="border-border mt-5 border-t pt-4">
-        <span className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
+        <span className="text-muted-foreground text-[11px] font-medium tracking-[0.12em] uppercase">
           alias
         </span>
         <p
-          className="mt-1.5 font-mono text-lg font-semibold tracking-tight text-[#1f6fe0] transition-opacity motion-reduce:transition-none dark:text-[#6ba4f5]"
+          className="mt-1.5 text-lg font-semibold tracking-tight text-[#1f6fe0] tabular-nums transition-opacity motion-reduce:transition-none dark:text-[#6ba4f5]"
           aria-live="polite"
         >
           {empty ? `${HOST}/······` : alias}
         </p>
-        <p className="text-muted-foreground mt-1.5 font-mono text-xs">
+        <p className="text-muted-foreground mt-1.5 text-xs tabular-nums">
           {empty
             ? "Paste a link to see its alias"
             : `${trimmed.length} → ${alias.length} characters · no expiry`}

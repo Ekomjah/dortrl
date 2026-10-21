@@ -1,6 +1,9 @@
 import type { RouteObject } from "react-router";
 import App from "./index";
 import Dashboard from "./dashboard";
+import LinksPage from "./links";
+import LinkDetail from "./linkDetail";
+import { AppShell } from "@/components/app-shell";
 import { ProtectedRoute } from "./protected";
 import { LoginForm } from "@/features/LoginForm";
 
@@ -42,12 +45,24 @@ export const routes: RouteObject[] = [
     element: <LoginForm />,
   },
   {
-    path: "/dashboard",
     element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <Dashboard />,
+        element: <AppShell />,
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+          },
+          {
+            path: "links",
+            element: <LinksPage />,
+          },
+          {
+            path: "links/:code",
+            element: <LinkDetail />,
+          },
+        ],
       },
     ],
   },

@@ -34,7 +34,9 @@ export function CapabilityList({
           key={item.label}
           className="grid gap-x-10 gap-y-2 py-8 md:grid-cols-[8rem_minmax(0,1fr)]"
         >
-          <dt className="font-label text-xl font-medium">{item.label}</dt>
+          <dt className="text-muted-foreground text-lg font-medium tracking-tight">
+            {item.label}
+          </dt>
           <dd>
             <h3 className="text-lg font-medium tracking-tight">{item.title}</h3>
             <p className="text-foreground/70 mt-2 max-w-prose">{item.body}</p>
