@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import type { Link as LinkRecord } from "@/lib/api/api";
-import { redirectHref, shortHref, shortLabel } from "@/lib/api/links";
+import { type Link as LinkRecord } from "@/lib/api/api";
+import { fullURL, redirectHref, shortHref, shortLabel } from "@/lib/api/links";
 import { actionClass, destructiveActionClass } from "./actionStyles";
 import { DeleteConfirm } from "./DeleteConfirm";
 import { EditLinkForm } from "./EditLinkForm";
@@ -14,8 +14,8 @@ export function LinkRow({ link }: { link: LinkRecord }) {
 
   const status = linkStatus(link.expires_at);
   const created = createdAgo(link.created_at);
-  const label = shortLabel(link.short_code);
-
+  const label = shortLabel(link.link_text ? link.link_text : link.short_code);
+  const url = fullURL(link.link_text ? link.link_text : link.short_code);
   async function copy() {
     try {
       await navigator.clipboard.writeText(shortHref(link.short_code));
@@ -52,7 +52,7 @@ export function LinkRow({ link }: { link: LinkRecord }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-2">
             <Link
-              to={`/links/${link.short_code}`}
+              to={url}
               className="text-[15px] font-semibold tracking-tight text-[#1f6fe0] tabular-nums hover:underline dark:text-[#6ba4f5]"
             >
               {label}

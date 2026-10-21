@@ -9,6 +9,8 @@ import { LoginForm } from "@/features/LoginForm";
 
 import { isRouteErrorResponse, useRouteError, Link } from "react-router";
 import { SignUpForm } from "@/features/SignUp";
+import { LinkNotFoundPage } from "@/features/NotFound";
+import { RedirectPage } from "@/features/Redirect";
 
 // eslint-disable-next-line
 function RouteError() {
@@ -65,6 +67,11 @@ export const routes: RouteObject[] = [
         ],
       },
     ],
+  },
+  { path: "/:code", element: <RedirectPage /> },
+  {
+    path: "/link-not-found",
+    element: <LinkNotFoundPage />,
   },
   {
     path: "*",

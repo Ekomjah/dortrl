@@ -1,4 +1,5 @@
-const rawHost = import.meta.env.VITE_SHORT_DOMAIN?.trim() || "dortrl.dev";
+const rawHost =
+  import.meta.env.VITE_SHORT_DOMAIN?.trim() || "http://localhost:5173";
 
 export const SHORT_HOST = rawHost
   .replace(/^https?:\/\//, "")
@@ -9,6 +10,10 @@ const SERVER_URL =
 
 export function shortLabel(code: string): string {
   return `${SHORT_HOST}/${code}`;
+}
+
+export function fullURL(code: string): string {
+  return `${rawHost}/${code}`;
 }
 
 export function shortHref(code: string): string {
