@@ -2,12 +2,13 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, anonymous } from "better-auth/plugins";
 import { db } from "../db/client";
-import * as schema from "../db/schema"; 
+import * as schema from "../db/schema";
 import { sendEmail } from "./emails/email";
 import { eq } from "drizzle-orm";
 import { links } from "../db/schema";
 
 export const auth = betterAuth({
+  baseURL: process.env.FRONTEND_URL || "http://localhost:8787",
   database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: { enabled: true },
   emailVerification: {
@@ -31,7 +32,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [process.env.SERVER_URL || "http://localhost:5173"], 
+  trustedOrigins: [process.env.SERVER_URL || "http://localhost:8787"],
   plugins: [
     openAPI(),
     anonymous({
