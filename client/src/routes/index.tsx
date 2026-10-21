@@ -1,6 +1,5 @@
 import { Link } from "react-router";
-
-import beaver from "@/assets/beaver.svg";
+import { useState, useEffect } from "react";
 import { ActionRow, LANDING_ACTIONS } from "@/features/landing/ActionRow";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,31 +8,56 @@ import {
 } from "@/features/landing/CapabilityList";
 import { ShortenConsole } from "@/features/landing/ShortenConsole";
 import CustomBtn from "@/features/Button";
+import { authClient } from "@/lib/auth/auth-client";
+import { Cable, House } from "lucide-react";
 
 function App() {
+  const [session, setSession] = useState<
+    Awaited<ReturnType<typeof authClient.getSession>>["data"] | null
+  >(null);
+
+  useEffect(() => {
+    async function getAuth() {
+      const { data: clientSession } = await authClient.getSession();
+      setSession(clientSession);
+    }
+    getAuth();
+  }, []);
   return (
     <div className="bg-background text-foreground min-h-screen">
       <div className="border-border border-b bg-[radial-gradient(70%_55%_at_50%_-10%,rgba(31,111,224/0.10),transparent)]">
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <span className="flex items-center gap-2.5">
-            <img src={beaver} alt="" className="size-7" />
+            <Cable />
             <span className="text-lg font-black tracking-tight">Dortrl</span>
           </span>
-          <div className="flex gap-x-4">
-            <Link
-              to="/sign-up"
-              className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
-            >
-              <CustomBtn type="button" text="Create an Account" />
-            </Link>
-            <Link
-              to="/login"
-              className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
-            >
-              <Button variant="outline" type="button">
-                Login
-              </Button>
-            </Link>
+          <div>
+            {session ? (
+              <div>
+                <CustomBtn
+                  text="Go to dashboard"
+                  to="/dashboard"
+                  icon={<House />}
+                />
+              </div>
+            ) : (
+              <div className="flex gap-x-4">
+                <Link
+                  to="/sign-up"
+                  className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
+                >
+                  <CustomBtn type="button" text="Create an Account" />
+                </Link>
+                <Link
+                  to="/login"
+                  className="text-foreground/70 hover:text-foreground text-sm font-medium transition-colors"
+                >
+                  <Button variant="outline" type="button">
+                    Login
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </header>
 

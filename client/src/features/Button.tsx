@@ -31,6 +31,7 @@ interface CustomBtnProps {
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
+  icon?: React.ReactElement;
 }
 
 export default function CustomBtn({
@@ -42,6 +43,7 @@ export default function CustomBtn({
   onClick,
   className,
   disabled = false,
+  icon,
 }: CustomBtnProps) {
   const styles =
     tone === "onBlue"
@@ -54,17 +56,26 @@ export default function CustomBtn({
 
   const cls = className ? `${styles} ${className}` : styles;
 
+  const content = icon ? (
+    <>
+      {icon}
+      {text}
+    </>
+  ) : (
+    text
+  );
+
   if (to) {
     return (
       <Button asChild onClick={onClick} className={cls} disabled={disabled}>
-        <Link to={to}>{text}</Link>
+        <Link to={to}>{content}</Link>
       </Button>
     );
   }
 
   return (
     <Button type={type} onClick={onClick} className={cls} disabled={disabled}>
-      {text}
+      {content}
     </Button>
   );
 }
