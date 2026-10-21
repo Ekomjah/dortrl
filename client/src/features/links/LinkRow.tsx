@@ -54,6 +54,7 @@ export function LinkRow({ link }: { link: LinkRecord }) {
           <div className="flex flex-wrap items-baseline gap-x-2">
             <a
               href={url}
+              target="_blank"
               className="text-[15px] font-semibold tracking-tight text-[#1f6fe0] tabular-nums hover:underline dark:text-[#6ba4f5]"
             >
               {label}
