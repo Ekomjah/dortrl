@@ -10,7 +10,7 @@ import { DeleteConfirm } from "@/features/links/DeleteConfirm";
 import { EditLinkForm } from "@/features/links/EditLinkForm";
 import { StatsSummary } from "@/features/links/StatsSummary";
 import { createdAgo, linkStatus } from "@/features/links/linkUtils";
-import { redirectHref, shortHref, shortLabel } from "@/lib/api/links";
+import { shortLabel, shortUrl } from "@/lib/api/links";
 import { useLinkStatsQuery } from "@/lib/api/queries/useLinkStatsQuery";
 
 export default function LinkDetail() {
@@ -22,7 +22,7 @@ export default function LinkDetail() {
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(shortHref(code));
+      await navigator.clipboard.writeText(shortUrl(code));
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -96,7 +96,7 @@ export default function LinkDetail() {
       ) : (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <a
-            href={redirectHref(data.short_code)}
+            href={shortUrl(data.short_code)}
             target="_blank"
             rel="noopener noreferrer"
             className={actionClass}

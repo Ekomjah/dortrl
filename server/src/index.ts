@@ -47,13 +47,19 @@ app.get("/:code", async (c) => {
     );
   }
 
-  statsService
+  const click = statsService
     .updateClicks(link.id, {
       referrer: c.req.header("referer"),
       userAgent: c.req.header("user-agent"),
       ipAddress: c.req.header("x-forwarded-for"),
     })
     .catch((err) => console.error("Failed to record click:", err));
+
+  try {
+    c.executionCtx.waitUntil(click);
+  } catch {
+    await click;
+  }
 
   return c.redirect(link.original_url, StatusCodes.MOVED_TEMPORARILY);
 });

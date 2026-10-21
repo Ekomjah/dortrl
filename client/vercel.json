@@ -4,6 +4,10 @@
       "source": "/api/:path*",
       "destination": "https://dortrl-api.ekomjahedet.workers.dev/api/:path*"
     },
+    {
+      "source": "/s/:code",
+      "destination": "https://dortrl-api.ekomjahedet.workers.dev/:code"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

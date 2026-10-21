@@ -2,10 +2,9 @@ import { useMemo, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import CustomBtn from "@/features/Button";
-import { SHORT_HOST } from "@/lib/api/links";
+import { shortLabel } from "@/lib/api/links";
 
 const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
-const HOST = SHORT_HOST;
 const CODE_LENGTH = 6;
 
 const SAMPLE =
@@ -33,7 +32,7 @@ export function ShortenConsole() {
   const [resolving, setResolving] = useState(false);
 
   const code = useMemo(() => shortCode(target), [target]);
-  const alias = `${HOST}/${code}`;
+  const alias = shortLabel(code);
   const trimmed = target.trim();
   const empty = trimmed.length === 0;
 
@@ -88,7 +87,7 @@ export function ShortenConsole() {
           }`}
           aria-live="polite"
         >
-          {empty ? `${HOST}/······` : alias}
+          {empty ? shortLabel("······") : alias}
         </p>
         <p className="text-muted-foreground mt-1.5 text-[11px] tabular-nums">
           {empty
