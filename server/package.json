@@ -19,7 +19,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "tsc",
-    "dev": "bun --watch run src/index.ts & tsc --watch",
+    "dev": "wrangler dev",
     "seed": "bun run ./src/db/scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
