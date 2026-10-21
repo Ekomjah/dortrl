@@ -49,9 +49,18 @@ export function ShortenConsole() {
   return (
     <form
       onSubmit={shorten}
-      className="border-border bg-card rounded-xl border p-5 shadow-[0_1px_3px_rgb(0_0_0/0.05)]"
+      className="border-border bg-card rounded-2xl border p-4 shadow-[0_24px_70px_-36px_rgb(10_84_196/0.5)] sm:p-5"
     >
-      <div className="flex gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-muted-foreground text-[11px] font-medium tracking-[0.16em] uppercase">
+          preview
+        </span>
+        <span className="text-muted-foreground text-[11px]">
+          nothing is created
+        </span>
+      </div>
+
+      <div className="mt-3 flex gap-2">
         <Input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -60,20 +69,28 @@ export function ShortenConsole() {
           spellCheck={false}
           className="text-sm tabular-nums"
         />
-        <CustomBtn text={resolving ? "Resolving" : "Shorten"} type="submit" />
+        <CustomBtn
+          text={resolving ? "Resolving" : "Shorten"}
+          type="submit"
+          className="shrink-0"
+        />
       </div>
 
-      <div className="border-border mt-5 border-t pt-4">
+      <div className="border-border mt-4 border-t pt-4">
         <span className="text-muted-foreground text-[11px] font-medium tracking-[0.12em] uppercase">
           alias
         </span>
         <p
-          className="mt-1.5 text-lg font-semibold tracking-tight text-[#1f6fe0] tabular-nums transition-opacity motion-reduce:transition-none dark:text-[#6ba4f5]"
+          className={`mt-1.5 text-lg font-semibold tracking-tight tabular-nums transition-opacity motion-reduce:transition-none ${
+            empty
+              ? "text-muted-foreground"
+              : "text-[#1f6fe0] dark:text-[#6ba4f5]"
+          }`}
           aria-live="polite"
         >
           {empty ? `${HOST}/······` : alias}
         </p>
-        <p className="text-muted-foreground mt-1.5 text-xs tabular-nums">
+        <p className="text-muted-foreground mt-1.5 text-[11px] tabular-nums">
           {empty
             ? "Paste a link to see its alias"
             : `${trimmed.length} → ${alias.length} characters · no expiry`}

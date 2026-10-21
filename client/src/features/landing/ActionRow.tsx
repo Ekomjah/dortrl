@@ -1,4 +1,6 @@
 import CustomBtn from "@/features/Button";
+import { authClient } from "@/lib/auth/auth-client";
+import { House, Loader2Icon } from "lucide-react";
 
 export interface LandingAction {
   label: string;
@@ -9,9 +11,8 @@ export interface LandingAction {
 }
 
 export const LANDING_ACTIONS: LandingAction[] = [
-  { label: "Create an account", to: "/sign-up", variant: "solid" },
+  { label: "Create account", to: "/sign-up", variant: "solid" },
   { label: "Log in", to: "/login", variant: "outline" },
-  { label: "Continue as guest", type: "button", variant: "outline" },
 ];
 
 export function ActionRow({
@@ -21,22 +22,34 @@ export function ActionRow({
   actions?: LandingAction[];
   tone?: "light" | "onBlue";
 }) {
+  const { data: session, isPending } = authClient.useSession();
+  if (isPending) {
+    return (
+      <Loader2Icon
+        role="status"
+        aria-label="Checking session"
+        className="text-muted-foreground size-4 animate-spin motion-reduce:animate-none"
+      />
+    );
+  }
+
+  if (!isPending && session) {
+    return (
+      <CustomBtn text="Go to dashboard" to="/dashboard" icon={<House />} />
+    );
+  }
+
   return (
-    <div
-      className={`flex flex-wrap items-center gap-x-4 gap-y-3 ${
-        tone === "onBlue" ? "justify-center" : "justify-start"
-      }`}
-    >
+    <div className="flex flex-wrap items-center gap-3">
       {actions.map((action) => (
-        <span key={action.label} className="inline-flex items-center gap-2">
-          <CustomBtn
-            text={action.label}
-            to={action.to}
-            type={action.type ?? "button"}
-            variant={action.variant}
-            tone={tone}
-          />
-        </span>
+        <CustomBtn
+          key={action.label}
+          text={action.label}
+          to={action.to}
+          type={action.type ?? "button"}
+          variant={action.variant}
+          tone={tone}
+        />
       ))}
     </div>
   );

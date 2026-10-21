@@ -32,14 +32,18 @@ export function CapabilityList({
       {items.map((item) => (
         <div
           key={item.label}
-          className="grid gap-x-10 gap-y-2 py-8 md:grid-cols-[8rem_minmax(0,1fr)]"
+          className="grid gap-x-10 gap-y-2 py-7 sm:py-8 md:grid-cols-[7rem_minmax(0,1fr)]"
         >
-          <dt className="text-muted-foreground text-lg font-medium tracking-tight">
+          <dt className="text-[11px] font-medium tracking-[0.16em] text-[#0a54c4] uppercase md:pt-1.5">
             {item.label}
           </dt>
           <dd>
-            <h3 className="text-lg font-medium tracking-tight">{item.title}</h3>
-            <p className="text-foreground/70 mt-2 max-w-prose">{item.body}</p>
+            <h3 className="text-lg font-semibold tracking-tight sm:text-xl">
+              {item.title}
+            </h3>
+            <p className="text-foreground/70 mt-1.5 max-w-prose text-sm leading-relaxed sm:text-base">
+              {item.body}
+            </p>
           </dd>
         </div>
       ))}
