@@ -133,7 +133,14 @@ export function LoginForm() {
             </Field>
           </FieldGroup>
         </form>
-        <p className="text-md mt-8 text-red-500">{formError && formError}</p>
+        <p className="text-md mt-4 text-red-500">{formError && formError}</p>
+
+        <div className="flex gap-0.5 text-gray-500">
+          <p>Don't have an account?</p>
+          <a href="/sign-up" className="underline">
+            Create one!
+          </a>
+        </div>
       </div>
     </div>
   );
