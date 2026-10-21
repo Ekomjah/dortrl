@@ -1,5 +1,4 @@
 import { Loader2Icon } from "lucide-react";
-
 import type { Link as LinkRecord } from "@/lib/api/api";
 import type { ApiError } from "@/lib/api/getAPIError";
 import { LinkRow } from "./LinkRow";
