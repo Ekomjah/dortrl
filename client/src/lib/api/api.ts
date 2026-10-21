@@ -32,20 +32,20 @@ export type UpdateLinkInput = Partial<CreateLinkInput>;
 const config = { withCredentials: true };
 
 export async function getLinks(): Promise<Link[]> {
-  const res = await api.get<Link[]>("/links", config);
+  const res = await api.get<Link[]>("/api/links", config);
   return res.data;
 }
 
 export async function getLinkStats(code: string): Promise<LinkStats> {
   const res = await api.get<LinkStats>(
-    `/${encodeURIComponent(code)}/stats`,
+    `/api/${encodeURIComponent(code)}/stats`,
     config,
   );
   return res.data;
 }
 
 export async function createLink(input: CreateLinkInput): Promise<Link> {
-  const res = await api.post<Link>("/links", input, config);
+  const res = await api.post<Link>("/api/links", input, config);
   return res.data;
 }
 
@@ -54,7 +54,7 @@ export async function updateLink(
   input: UpdateLinkInput,
 ): Promise<Link> {
   const res = await api.patch<Link>(
-    `/links/${encodeURIComponent(code)}`,
+    `/api/links/${encodeURIComponent(code)}`,
     input,
     config,
   );
@@ -62,5 +62,5 @@ export async function updateLink(
 }
 
 export async function deleteLink(code: string): Promise<void> {
-  await api.delete(`/links/${encodeURIComponent(code)}`, config);
+  await api.delete(`/api/links/${encodeURIComponent(code)}`, config);
 }

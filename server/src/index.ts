@@ -5,11 +5,10 @@ import { ConflictError } from "./lib/errors";
 import { requestLogger } from "./middleware/logger";
 import linksRoute from "./routes/links/links.routes";
 import { linksRepository } from "./routes/links/links.service";
-import statsRoute from "./routes/stats/stats.routes";
+import { healthRoute, statsRoute } from "./routes/stats/stats.routes";
 import { statsService } from "./routes/stats/stats.service";
 import { auth } from "./lib/auth";
 import { runLinkCleanup } from "./jobs/link-cleanup";
-import { link } from "node:fs/promises";
 
 const app = new Hono({ strict: false });
 app.use(cors({ origin: process.env.FRONTEND_URL!, credentials: true }));
@@ -33,16 +32,9 @@ app.get("/", (c) => {
   return c.json({ id: 1, text: "Hello Hono!" });
 });
 app.get("/favicon.ico", (c) => c.body(null, 204));
-app.route("/", statsRoute);
-app.route("/links", linksRoute);
-
-app.get("/:code/destination", async (c) => {
-  const { code } = c.req.param();
-  const link = await linksRepository.getLink;
-  if (!link) {
-    return c.json({ message: ReasonPhrases.NOT_FOUND }, StatusCodes.NOT_FOUND);
-  }
-});
+app.route("/", healthRoute);
+app.route("/api/links", linksRoute);
+app.route("/api", statsRoute);
 
 app.get("/:code", async (c) => {
   const { code } = c.req.param();

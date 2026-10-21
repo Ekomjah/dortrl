@@ -1,25 +1,29 @@
+import { REDIRECT_BASE } from "./config";
+
 const rawHost =
-  import.meta.env.VITE_SHORT_DOMAIN?.trim() || "http://localhost:5173";
+  import.meta.env.VITE_SHORT_DOMAIN?.trim() ||
+  (import.meta.env.DEV ? "http://localhost:5173" : "dortrl.dev");
 
 export const SHORT_HOST = rawHost
   .replace(/^https?:\/\//, "")
   .replace(/\/$/, "");
 
-const SERVER_URL =
-  import.meta.env.VITE_SERVER_URL?.trim() || "http://localhost:8787";
+const shortProtocol = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(SHORT_HOST)
+  ? "http"
+  : "https";
 
 export function shortLabel(code: string): string {
   return `${SHORT_HOST}/${code}`;
 }
 
 export function fullURL(code: string): string {
-  return `${rawHost}/${code}`;
+  return `${window.location.origin}/${code}`;
 }
 
 export function shortHref(code: string): string {
-  return `https://${SHORT_HOST}/${code}`;
+  return `${shortProtocol}://${SHORT_HOST}/${code}`;
 }
 
 export function redirectHref(code: string): string {
-  return `${SERVER_URL.replace(/\/$/, "")}/${code}`;
+  return `${REDIRECT_BASE.replace(/\/$/, "")}/${code}`;
 }

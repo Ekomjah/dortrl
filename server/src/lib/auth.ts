@@ -7,8 +7,13 @@ import { sendEmail } from "./emails/email";
 import { eq } from "drizzle-orm";
 import { links } from "../db/schema";
 
+const trustedOrigins = [process.env.FRONTEND_URL, process.env.SERVER_URL].filter(
+  (origin): origin is string => Boolean(origin),
+);
+
 export const auth = betterAuth({
   baseURL: process.env.FRONTEND_URL || "http://localhost:8787",
+  secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: { enabled: true },
   emailVerification: {
@@ -32,7 +37,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [process.env.SERVER_URL || "http://localhost:8787"],
+  trustedOrigins,
   plugins: [
     openAPI(),
     anonymous({

@@ -7,15 +7,16 @@ import {
   requireFullAccount,
 } from "@/middleware/auth.middleware.js";
 
-const statsRoute = new Hono<HonoEnv>()
-  .use(optionalAuth)
-  .get("/health", async (c) => {
-    const health = await statsService.healthCheck();
-    const status =
-      health.status === "ok" ? StatusCodes.OK : StatusCodes.SERVICE_UNAVAILABLE;
+export const healthRoute = new Hono<HonoEnv>().get("/health", async (c) => {
+  const health = await statsService.healthCheck();
+  const status =
+    health.status === "ok" ? StatusCodes.OK : StatusCodes.SERVICE_UNAVAILABLE;
 
-    return c.json(health, status);
-  })
+  return c.json(health, status);
+});
+
+export const statsRoute = new Hono<HonoEnv>()
+  .use(optionalAuth)
   .get("/:code/stats", requireFullAccount, async (c) => {
     const user = c.get("user");
     const { code } = c.req.param();
@@ -27,4 +28,5 @@ const statsRoute = new Hono<HonoEnv>()
 
     return c.json(link);
   });
+
 export default statsRoute;

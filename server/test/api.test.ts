@@ -7,7 +7,7 @@ import { auth } from "../src/lib/auth.js";
 // They describe the target API contract; endpoints not yet built should fail
 // here (RED), driving the implementation.
 
-// /links is behind `requireUser` / `enforceLinkLimit` / `requireFullAccount`,
+// /api/links is behind `requireUser` / `enforceLinkLimit` / `requireFullAccount`,
 // so every request to it needs a session cookie. Sign up per test rather than
 // once: the shared teardown empties `user` and `session` after every test, so a
 // single long-lived session would only survive the first one.
@@ -35,7 +35,7 @@ function authed(path: string, init: RequestInit = {}) {
 }
 
 async function createLink(original_url = "https://example.com/") {
-  return authed("/links", {
+  return authed("/api/links", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ original_url }),
@@ -59,7 +59,7 @@ describe("gET /health", () => {
   });
 });
 
-describe("pOST /links", () => {
+describe("pOST /api/links", () => {
   it("creates a short link with a short_code", async () => {
     const res = await createLink("https://example.com/foo");
     expect(res.status).toBe(StatusCodes.CREATED);
@@ -72,7 +72,7 @@ describe("pOST /links", () => {
 
 describe("link_text addressing", () => {
   async function createWithText(url: string, link_text?: string) {
-    const res = await authed("/links", {
+    const res = await authed("/api/links", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ original_url: url, link_text }),
@@ -150,7 +150,7 @@ describe("link_text addressing", () => {
   it("rejects a duplicate short_code on update with a conflict", async () => {
     const a = await (await createWithText("https://upd-a.test/")).json();
     const b = await (await createWithText("https://upd-b.test/")).json();
-    const res = await authed(`/links/${b.short_code}`, {
+    const res = await authed(`/api/links/${b.short_code}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ short_code: a.short_code }),
@@ -163,19 +163,19 @@ describe("link_text addressing", () => {
       await createWithText("https://statsby.test/", "statstext")
     ).json();
     await app.request(`/${body.short_code}`);
-    const byCode = await authed(`/${body.short_code}/stats`);
+    const byCode = await authed(`/api/${body.short_code}/stats`);
     expect(byCode.status).toBe(StatusCodes.OK);
 
-    const byText = await authed("/statstext/stats");
+    const byText = await authed("/api/statstext/stats");
     expect(byText.status).toBe(StatusCodes.NOT_FOUND);
   });
 });
 
-describe("gET /links", () => {
+describe("gET /api/links", () => {
   it("lists all created links", async () => {
     await createLink("https://a.test/");
     await createLink("https://b.test/");
-    const res = await authed("/links");
+    const res = await authed("/api/links");
     expect(res.status).toBe(StatusCodes.OK);
     const body = await res.json();
     expect(Array.isArray(body)).toBe(true);
@@ -196,18 +196,21 @@ describe("gET /:code (redirect)", () => {
     expect(res.headers.get("location")).toBe("https://redirect.test/");
   });
 
-  it("returns not found for an unknown code", async () => {
+  it("redirects an unknown code to the frontend not-found page", async () => {
     const res = await app.request("/definitely-not-a-real-code");
-    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+    expect(res.status).toBe(StatusCodes.MOVED_TEMPORARILY);
+    expect(res.headers.get("location")).toContain(
+      "/link-not-found?code=definitely-not-a-real-code",
+    );
   });
 });
 
-describe("gET /:code/stats", () => {
+describe("gET /api/:code/stats", () => {
   it("returns the click count for a link", async () => {
     const created = await (await createLink("https://stats.test/")).json();
     await app.request(`/${created.short_code}`);
     await app.request(`/${created.short_code}`);
-    const res = await authed(`/${created.short_code}/stats`);
+    const res = await authed(`/api/${created.short_code}/stats`);
     expect(res.status).toBe(StatusCodes.OK);
     const body = await res.json();
     expect(body.original_url).toBe("https://stats.test/");
@@ -218,12 +221,12 @@ describe("gET /:code/stats", () => {
 
 describe("authentication", () => {
   it("rejects /links without a session", async () => {
-    const res = await app.request("/links");
+    const res = await app.request("/api/links");
     expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
   it("rejects link creation without a session", async () => {
-    const res = await app.request("/links", {
+    const res = await app.request("/api/links", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ original_url: "https://unauth.test/" }),
@@ -232,7 +235,7 @@ describe("authentication", () => {
   });
 
   it("scopes the link list to the signed-in user", async () => {
-    const res = await authed("/links");
+    const res = await authed("/api/links");
     expect(res.status).toBe(StatusCodes.OK);
     for (const link of await res.json()) {
       expect(typeof link.user_id).toBe("string");
@@ -240,19 +243,20 @@ describe("authentication", () => {
   });
 });
 
-describe("dELETE /links/:code", () => {
+describe("dELETE /api/links/:code", () => {
   it("deletes a link and its code stops resolving", async () => {
     const created = await (await createLink("https://del.test/")).json();
-    const del = await authed(`/links/${created.short_code}`, {
+    const del = await authed(`/api/links/${created.short_code}`, {
       method: "DELETE",
     });
     expect(del.status).toBe(StatusCodes.NO_CONTENT);
     const after = await app.request(`/${created.short_code}`);
-    expect(after.status).toBe(StatusCodes.NOT_FOUND);
+    expect(after.status).toBe(StatusCodes.MOVED_TEMPORARILY);
+    expect(after.headers.get("location")).toContain("/link-not-found");
   });
 
   it('returns "not found" when deleting an unknown code', async () => {
-    const res = await authed("/links/unknown-code", { method: "DELETE" });
+    const res = await authed("/api/links/unknown-code", { method: "DELETE" });
     expect(res.status).toBe(StatusCodes.NOT_FOUND);
   });
 });
