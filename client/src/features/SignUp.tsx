@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import CustomBtn from "./Button";
+import { SocialAuthButtons } from "./SocialAuth";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { authClient } from "@/lib/auth/auth-client";
@@ -75,6 +76,7 @@ export function SignUpForm() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-md bg-gray-100 p-8 shadow-lg">
+        <SocialAuthButtons />
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <FieldSet>

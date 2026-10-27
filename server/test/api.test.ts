@@ -335,6 +335,43 @@ describe("anonymous (guest) accounts", () => {
   });
 });
 
+describe("social sign-in", () => {
+  const origin = process.env.FRONTEND_URL ?? "http://localhost:5173";
+
+  function signInWith(provider: "google" | "github") {
+    return app.request("/api/auth/sign-in/social", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin },
+      body: JSON.stringify({
+        provider,
+        callbackURL: `${origin}/dashboard`,
+      }),
+    });
+  }
+
+  it("returns a Google authorize URL with the app callback", async () => {
+    const res = await signInWith("google");
+    expect(res.status).toBe(StatusCodes.OK);
+    const body = await res.json();
+    expect(body.redirect).toBe(true);
+    expect(body.url).toContain("accounts.google.com");
+    expect(decodeURIComponent(body.url)).toContain(
+      `${origin}/api/auth/callback/google`,
+    );
+  });
+
+  it("returns a GitHub authorize URL with the app callback", async () => {
+    const res = await signInWith("github");
+    expect(res.status).toBe(StatusCodes.OK);
+    const body = await res.json();
+    expect(body.redirect).toBe(true);
+    expect(body.url).toContain("github.com/login/oauth/authorize");
+    expect(decodeURIComponent(body.url)).toContain(
+      `${origin}/api/auth/callback/github`,
+    );
+  });
+});
+
 describe("dELETE /api/links/:code", () => {
   it("deletes a link and its code stops resolving", async () => {
     const created = await (await createLink("https://del.test/")).json();
