@@ -1,18 +1,12 @@
 import { Link } from "react-router";
 
-import {
-  ActionRow,
-  GUEST_ACTION,
-  LANDING_ACTIONS,
-} from "@/features/landing/ActionRow";
+import { ActionRow, LANDING_ACTIONS } from "@/features/landing/ActionRow";
 import {
   CAPABILITIES,
   CapabilityList,
 } from "@/features/landing/CapabilityList";
 import { ShortenConsole } from "@/features/landing/ShortenConsole";
 import { Cable } from "lucide-react";
-
-const HOME_ACTIONS = [...LANDING_ACTIONS, GUEST_ACTION];
 
 function App() {
   return (
@@ -52,7 +46,7 @@ function App() {
             </p>
 
             <div className="mt-8 sm:mt-10">
-              <ActionRow actions={HOME_ACTIONS} />
+              <ActionRow actions={LANDING_ACTIONS} />
             </div>
           </div>
 
@@ -97,7 +91,7 @@ function App() {
               Create an account, paste a URL, and watch the clicks arrive.
             </p>
           </div>
-          <ActionRow actions={HOME_ACTIONS} tone="onBlue" />
+          <ActionRow actions={LANDING_ACTIONS} tone="onBlue" />
         </div>
       </section>
     </div>

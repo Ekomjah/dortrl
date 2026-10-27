@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { authClient } from "@/lib/auth/auth-client";
-
+import { Link } from "react-router";
 interface TextInputValueChange {
   target: {
     value: string;
@@ -67,7 +67,13 @@ export function LoginForm() {
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <FieldSet>
-              <FieldLegend>Log in to your Dortrl Account</FieldLegend>
+              <FieldLegend>
+                Log in to your{" "}
+                <Link to="/" className="font-bold underline">
+                  Dortrl
+                </Link>{" "}
+                Account
+              </FieldLegend>
               <FieldDescription>Secured with BetterAuth</FieldDescription>
               <FieldGroup>
                 <Field>

@@ -7,7 +7,7 @@ export const useSignOut = () => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          navigate("/login"); // Redirect to login page
+          navigate("/");
         },
       },
     });

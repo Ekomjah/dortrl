@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import CustomBtn from "@/features/Button";
 import { authClient } from "@/lib/auth/auth-client";
@@ -16,13 +16,13 @@ export interface LandingAction {
 export const LANDING_ACTIONS: LandingAction[] = [
   { label: "Create account", to: "/sign-up", variant: "solid" },
   { label: "Log in", to: "/login", variant: "outline" },
+  {
+    label: "Continue as guest",
+    to: "/dashboard",
+    kind: "anonymous",
+    variant: "outline",
+  },
 ];
-
-export const GUEST_ACTION: LandingAction = {
-  label: "Continue as guest",
-  kind: "anonymous",
-  variant: "outline",
-};
 
 export function ActionRow({
   actions = LANDING_ACTIONS,
@@ -31,12 +31,19 @@ export function ActionRow({
   actions?: LandingAction[];
   tone?: "light" | "onBlue";
 }) {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending, refetch } = authClient.useSession();
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [guestTarget, setGuestTarget] = useState<string | null>(null);
 
-  async function startGuest() {
+  useEffect(() => {
+    if (!guestTarget || !session) return;
+    navigate(guestTarget, { replace: true });
+    setGuestTarget(null);
+  }, [guestTarget, session, navigate]);
+
+  async function startGuest(target: string) {
     if (starting) return;
     setStarting(true);
     setError(null);
@@ -49,7 +56,8 @@ export function ActionRow({
         setError(error.message ?? "Could not start a guest session.");
         return;
       }
-      navigate("/dashboard");
+      setGuestTarget(target);
+      void refetch();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -83,7 +91,7 @@ export function ActionRow({
             type="button"
             variant={action.variant}
             tone={tone}
-            onClick={startGuest}
+            onClick={() => startGuest(action.to ?? "/dashboard")}
             disabled={starting}
           />
         ) : (
