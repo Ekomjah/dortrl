@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import CustomBtn from "@/features/Button";
 import { authClient } from "@/lib/auth/auth-client";
 import { House, Loader2Icon } from "lucide-react";
@@ -8,12 +10,19 @@ export interface LandingAction {
   type?: "submit" | "button" | "reset";
   variant?: "solid" | "outline";
   badge?: string;
+  kind?: "anonymous";
 }
 
 export const LANDING_ACTIONS: LandingAction[] = [
   { label: "Create account", to: "/sign-up", variant: "solid" },
   { label: "Log in", to: "/login", variant: "outline" },
 ];
+
+export const GUEST_ACTION: LandingAction = {
+  label: "Continue as guest",
+  kind: "anonymous",
+  variant: "outline",
+};
 
 export function ActionRow({
   actions = LANDING_ACTIONS,
@@ -23,6 +32,31 @@ export function ActionRow({
   tone?: "light" | "onBlue";
 }) {
   const { data: session, isPending } = authClient.useSession();
+  const navigate = useNavigate();
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function startGuest() {
+    if (starting) return;
+    setStarting(true);
+    setError(null);
+    try {
+      const { error } = await authClient.signIn.anonymous();
+      if (
+        error &&
+        error.code !== "ANONYMOUS_USERS_CANNOT_SIGN_IN_AGAIN_ANONYMOUSLY"
+      ) {
+        setError(error.message ?? "Could not start a guest session.");
+        return;
+      }
+      navigate("/dashboard");
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setStarting(false);
+    }
+  }
+
   if (isPending) {
     return (
       <Loader2Icon
@@ -41,16 +75,33 @@ export function ActionRow({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {actions.map((action) => (
-        <CustomBtn
-          key={action.label}
-          text={action.label}
-          to={action.to}
-          type={action.type ?? "button"}
-          variant={action.variant}
-          tone={tone}
-        />
-      ))}
+      {actions.map((action) =>
+        action.kind === "anonymous" ? (
+          <CustomBtn
+            key={action.label}
+            text={starting ? "Starting" : action.label}
+            type="button"
+            variant={action.variant}
+            tone={tone}
+            onClick={startGuest}
+            disabled={starting}
+          />
+        ) : (
+          <CustomBtn
+            key={action.label}
+            text={action.label}
+            to={action.to}
+            type={action.type ?? "button"}
+            variant={action.variant}
+            tone={tone}
+          />
+        ),
+      )}
+      {error ? (
+        <p className="text-destructive basis-full text-xs" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

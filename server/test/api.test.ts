@@ -243,6 +243,98 @@ describe("authentication", () => {
   });
 });
 
+describe("anonymous (guest) accounts", () => {
+  async function guestCookie() {
+    const res = await auth.api.signInAnonymous({ asResponse: true });
+    const setCookie = res.headers.get("set-cookie");
+    if (!setCookie) throw new Error("anonymous sign-in returned no cookie");
+    return setCookie.split(";")[0];
+  }
+
+  function asGuest(jar: string, path: string, init: RequestInit = {}) {
+    return app.request(path, {
+      ...init,
+      headers: { cookie: jar, ...(init.headers ?? {}) },
+    });
+  }
+
+  function createGuestLink(jar: string, original_url: string) {
+    return asGuest(jar, "/api/links", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ original_url }),
+    });
+  }
+
+  it("allows two links, then rejects a third", async () => {
+    const jar = await guestCookie();
+    expect(
+      (await createGuestLink(jar, "https://guest-a.test/")).status,
+    ).toBe(StatusCodes.CREATED);
+    expect(
+      (await createGuestLink(jar, "https://guest-b.test/")).status,
+    ).toBe(StatusCodes.CREATED);
+    const third = await createGuestLink(jar, "https://guest-c.test/");
+    expect(third.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("blocks stats, edits, and deletes", async () => {
+    const jar = await guestCookie();
+    const created = await (
+      await createGuestLink(jar, "https://guest-manage.test/")
+    ).json();
+
+    const stats = await asGuest(jar, `/api/${created.short_code}/stats`);
+    expect(stats.status).toBe(StatusCodes.FORBIDDEN);
+
+    const patch = await asGuest(jar, `/api/links/${created.short_code}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ link_text: "guest-edit" }),
+    });
+    expect(patch.status).toBe(StatusCodes.FORBIDDEN);
+
+    const del = await asGuest(jar, `/api/links/${created.short_code}`, {
+      method: "DELETE",
+    });
+    expect(del.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it("moves guest links into the account on sign-up", async () => {
+    const jar = await guestCookie();
+    const created = await (
+      await createGuestLink(jar, "https://guest-claim.test/")
+    ).json();
+
+    const signUp = await app.request("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: jar,
+        origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
+      },
+      body: JSON.stringify({
+        email: `guest-up-${crypto.randomUUID()}@test.local`,
+        password: "Str0ngPassw0rd!",
+        name: "Guest Up",
+      }),
+    });
+    expect(signUp.status).toBe(StatusCodes.OK);
+
+    const setCookie = signUp.headers.get("set-cookie");
+    if (!setCookie) throw new Error("sign-up did not return a session cookie");
+    const accountCookie = setCookie.split(";")[0];
+
+    const list = await asGuest(accountCookie, "/api/links");
+    expect(list.status).toBe(StatusCodes.OK);
+    const links = await list.json();
+    expect(links.map((link: { id: number }) => link.id)).toContain(created.id);
+
+    const oldSession = await asGuest(jar, "/api/auth/get-session");
+    expect(await oldSession.json()).toBeNull();
+  });
+});
+
 describe("dELETE /api/links/:code", () => {
   it("deletes a link and its code stops resolving", async () => {
     const created = await (await createLink("https://del.test/")).json();

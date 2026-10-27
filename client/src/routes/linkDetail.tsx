@@ -12,10 +12,12 @@ import { StatsSummary } from "@/features/links/StatsSummary";
 import { createdAgo, linkStatus } from "@/features/links/linkUtils";
 import { shortLabel, shortUrl } from "@/lib/api/links";
 import { useLinkStatsQuery } from "@/lib/api/queries/useLinkStatsQuery";
+import { useIsGuest } from "@/lib/auth/useIsGuest";
 
 export default function LinkDetail() {
   const { code = "" } = useParams();
   const navigate = useNavigate();
+  const guest = useIsGuest();
   const { data, isPending, isError, error } = useLinkStatsQuery(code);
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [copied, setCopied] = useState(false);
@@ -28,6 +30,26 @@ export default function LinkDetail() {
     } catch {
       // Clipboard is unavailable in insecure contexts.
     }
+  }
+
+  if (guest) {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-lg font-semibold">Sign up to see stats</p>
+        <p className="text-muted-foreground text-sm">
+          Click analytics are available on a full account.
+        </p>
+        <Link
+          to="/sign-up"
+          className="text-sm text-[#1f6fe0] hover:underline dark:text-[#6ba4f5]"
+        >
+          Create account
+        </Link>
+        <Link to="/links" className={actionClass}>
+          ← Links
+        </Link>
+      </div>
+    );
   }
 
   if (isPending) {

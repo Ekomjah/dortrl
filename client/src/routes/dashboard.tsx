@@ -1,9 +1,11 @@
 import { Link } from "react-router";
 
+import { GuestNotice } from "@/components/guest-notice";
 import { AddLinkForm } from "@/features/links/AddLinkForm";
 import { LinkList } from "@/features/links/LinkList";
 import { useLinksQuery } from "@/lib/api/queries/useLinksQuery";
 import { authClient } from "@/lib/auth/auth-client";
+import { isGuestUser } from "@/lib/auth/useIsGuest";
 
 const RECENT_LIMIT = 6;
 
@@ -21,11 +23,12 @@ export default function Dashboard() {
         : "Good Evening!";
 
   const { data: session } = authClient.useSession();
+  const guest = isGuestUser(session?.user);
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-1">
         <p className="text-muted-foreground text-sm">
-          {greeting}, {session?.user?.name ?? ""}{" "}
+          {greeting}, {guest ? "guest" : (session?.user?.name ?? "")}{" "}
         </p>
         <div className="flex items-baseline justify-between gap-4">
           <h1 className="text-2xl font-bold tracking-tight">Recent links</h1>
@@ -37,6 +40,8 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {guest ? <GuestNotice /> : null}
+
       <AddLinkForm />
 
       <LinkList
@@ -45,6 +50,7 @@ export default function Dashboard() {
         isError={isError}
         error={error}
         isFetching={isFetching}
+        isGuest={guest}
       />
 
       {total > RECENT_LIMIT ? (

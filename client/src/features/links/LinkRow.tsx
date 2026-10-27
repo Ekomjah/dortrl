@@ -8,7 +8,13 @@ import { DeleteConfirm } from "./DeleteConfirm";
 import { EditLinkForm } from "./EditLinkForm";
 import { createdAgo, linkStatus } from "./linkUtils";
 
-export function LinkRow({ link }: { link: LinkRecord }) {
+export function LinkRow({
+  link,
+  isGuest = false,
+}: {
+  link: LinkRecord;
+  isGuest?: boolean;
+}) {
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [copied, setCopied] = useState(false);
 
@@ -92,23 +98,31 @@ export function LinkRow({ link }: { link: LinkRecord }) {
         <button type="button" className={actionClass} onClick={copy}>
           {copied ? "copied" : "copy"}
         </button>
-        <button
-          type="button"
-          className={actionClass}
-          onClick={() => setMode("edit")}
-        >
-          edit
-        </button>
-        <Link to={`/links/${link.short_code}`} className={actionClass}>
-          stats
-        </Link>
-        <button
-          type="button"
-          className={destructiveActionClass}
-          onClick={() => setMode("delete")}
-        >
-          delete
-        </button>
+        {isGuest ? (
+          <Link to="/sign-up" className={actionClass}>
+            sign up to manage
+          </Link>
+        ) : (
+          <>
+            <button
+              type="button"
+              className={actionClass}
+              onClick={() => setMode("edit")}
+            >
+              edit
+            </button>
+            <Link to={`/links/${link.short_code}`} className={actionClass}>
+              stats
+            </Link>
+            <button
+              type="button"
+              className={destructiveActionClass}
+              onClick={() => setMode("delete")}
+            >
+              delete
+            </button>
+          </>
+        )}
       </div>
     </li>
   );

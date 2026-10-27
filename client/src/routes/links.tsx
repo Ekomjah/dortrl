@@ -1,12 +1,15 @@
 import { useMemo, useState } from "react";
 
+import { GuestNotice } from "@/components/guest-notice";
 import { Input } from "@/components/ui/input";
 import { AddLinkForm } from "@/features/links/AddLinkForm";
 import { LinkList } from "@/features/links/LinkList";
 import { useLinksQuery } from "@/lib/api/queries/useLinksQuery";
+import { useIsGuest } from "@/lib/auth/useIsGuest";
 
 export default function LinksPage() {
   const { data, isPending, isError, error, isFetching } = useLinksQuery();
+  const guest = useIsGuest();
   const [filter, setFilter] = useState("");
 
   const filtered = useMemo(() => {
@@ -29,6 +32,8 @@ export default function LinksPage() {
         </span>
       </header>
 
+      {guest ? <GuestNotice /> : null}
+
       <AddLinkForm />
 
       <Input
@@ -44,6 +49,7 @@ export default function LinksPage() {
         isError={isError}
         error={error}
         isFetching={isFetching}
+        isGuest={guest}
         emptyMessage={
           filter
             ? "No links match that filter."

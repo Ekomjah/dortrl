@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from "react-router";
 
 import beaver from "@/assets/beaver.svg";
 import { authClient } from "@/lib/auth/auth-client";
+import { isGuestUser } from "@/lib/auth/useIsGuest";
 import { useSignOut } from "@/lib/auth/useSignOut";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -13,6 +14,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function AppShell() {
   const { data: session } = authClient.useSession();
+  const guest = isGuestUser(session?.user);
   const signOut = useSignOut();
 
   return (
@@ -34,18 +36,31 @@ export function AppShell() {
           </nav>
 
           <div className="ml-auto flex items-center gap-4">
-            {session?.user?.email ? (
+            {guest ? (
+              <span className="text-muted-foreground hidden text-sm sm:block">
+                Guest
+              </span>
+            ) : session?.user?.email ? (
               <span className="text-muted-foreground hidden truncate text-sm sm:block">
                 {session.user.email}
               </span>
             ) : null}
-            <button
-              type="button"
-              onClick={signOut}
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              Sign out
-            </button>
+            {guest ? (
+              <Link
+                to="/sign-up"
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+              >
+                Create account
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={signOut}
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+              >
+                Sign out
+              </button>
+            )}
           </div>
         </div>
       </header>

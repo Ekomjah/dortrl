@@ -10,6 +10,7 @@ export function LinkList({
   error,
   isFetching = false,
   emptyMessage = "No links yet. Create your first one above.",
+  isGuest = false,
 }: {
   links: LinkRecord[] | undefined;
   isPending: boolean;
@@ -17,6 +18,7 @@ export function LinkList({
   error: ApiError | null;
   isFetching?: boolean;
   emptyMessage?: string;
+  isGuest?: boolean;
 }) {
   if (isPending) {
     return (
@@ -56,7 +58,7 @@ export function LinkList({
       ) : null}
       <ol className="divide-border border-border divide-y border-y">
         {links.map((link) => (
-          <LinkRow key={link.id} link={link} />
+          <LinkRow key={link.id} link={link} isGuest={isGuest} />
         ))}
       </ol>
     </div>
